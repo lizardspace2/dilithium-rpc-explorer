@@ -127,12 +127,12 @@ block content
 				if (getdeploymentinfo && getdeploymentinfo.deployments)
 					-
 						var forkUrls = {
-							"bip34":  { "link": "https://github.com/bitcoin/bips/blob/master/bip-0034.mediawiki", "title": "Block v2, Height in Coinbase" },
-							"bip65":  { "link": "https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki", "title": "OP_CHECKLOCKTIMEVERIFY" },
-							"bip66":  { "link": "https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki", "title": "Strict DER signatures" },
-							"csv":    { "link": "https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki", "title": "OP_CHECKSEQUENCEVERIFY" },
-							"segwit": { "link": "https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki", "title": "Segregated Witness (Consensus layer)" }, 
-							"taproot":{ "link": "https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki", "title": "Taproot: SegWit version 1 spending rules" }
+							"bip34":  { "link": "https://github.com/Dilithium/bips/blob/master/bip-0034.mediawiki", "title": "Block v2, Height in Coinbase" },
+							"bip65":  { "link": "https://github.com/Dilithium/bips/blob/master/bip-0065.mediawiki", "title": "OP_CHECKLOCKTIMEVERIFY" },
+							"bip66":  { "link": "https://github.com/Dilithium/bips/blob/master/bip-0066.mediawiki", "title": "Strict DER signatures" },
+							"csv":    { "link": "https://github.com/Dilithium/bips/blob/master/bip-0112.mediawiki", "title": "OP_CHECKSEQUENCEVERIFY" },
+							"segwit": { "link": "https://github.com/Dilithium/bips/blob/master/bip-0141.mediawiki", "title": "Segregated Witness (Consensus layer)" }, 
+							"taproot":{ "link": "https://github.com/Dilithium/bips/blob/master/bip-0341.mediawiki", "title": "Taproot: SegWit version 1 spending rules" }
 						};
 
 					+contentSection("Deployments")
@@ -207,7 +207,7 @@ block content
 
 					else
 						// more modern format
-						- var forkUrls = {"bip34":"https://github.com/bitcoin/bips/blob/master/bip-0034.mediawiki", "bip65":"https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki", "bip66":"https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki", "csv":"https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki", "segwit":"https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki", "taproot":"https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki"};
+						- var forkUrls = {"bip34":"https://github.com/Dilithium/bips/blob/master/bip-0034.mediawiki", "bip65":"https://github.com/Dilithium/bips/blob/master/bip-0065.mediawiki", "bip66":"https://github.com/Dilithium/bips/blob/master/bip-0066.mediawiki", "csv":"https://github.com/Dilithium/bips/blob/master/bip-0112.mediawiki", "segwit":"https://github.com/Dilithium/bips/blob/master/bip-0141.mediawiki", "taproot":"https://github.com/Dilithium/bips/blob/master/bip-0341.mediawiki"};
 
 						+contentSection("Soft Forks")
 							+summaryRow(utils.objectProperties(getblockchaininfo.softforks).length)

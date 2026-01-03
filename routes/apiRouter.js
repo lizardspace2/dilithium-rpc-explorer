@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug");
-const debugLog = debug("btcexp:router");
+const debugLog = debug("dilithiumexp:router");
 
 const express = require('express');
 const router = express.Router();
@@ -24,12 +24,12 @@ const addressApi = require("./../app/api/addressApi.js");
 const xyzpubApi = require("./../app/api/xyzpubApi.js");
 const rpcApi = require("./../app/api/rpcApi.js");
 const apiDocs = require("./../docs/api.js");
-const btcQuotes = require("./../app/coins/btcQuotes.js");
+const dilithiumQuotes = require("./../app/coins/dilithiumQuotes.js");
 
 
 
 
-router.get("/docs", function(req, res, next) {
+router.get("/docs", function (req, res, next) {
 	res.locals.apiDocs = apiDocs;
 	res.locals.apiBaseUrl = apiDocs.baseUrl;
 	res.locals.route = req.query.route;
@@ -39,7 +39,7 @@ router.get("/docs", function(req, res, next) {
 		let category = x.category;
 
 		if (!res.locals.categories.find(y => (y.name == category))) {
-			res.locals.categories.push({name:category, items:[]});
+			res.locals.categories.push({ name: category, items: [] });
 		}
 
 		res.locals.categories.find(x => (x.name == category)).items.push(x);
@@ -50,7 +50,7 @@ router.get("/docs", function(req, res, next) {
 	next();
 });
 
-router.get("/changelog", function(req, res, next) {
+router.get("/changelog", function (req, res, next) {
 	res.locals.changelogHtml = markdown.render(global.apiChangelogMarkdown);
 
 	res.render("api-changelog");
@@ -58,7 +58,7 @@ router.get("/changelog", function(req, res, next) {
 	next();
 });
 
-router.get("/version", function(req, res, next) {
+router.get("/version", function (req, res, next) {
 	res.send(apiDocs.version);
 
 	next();
@@ -83,7 +83,7 @@ router.get("/blocks/tip", asyncHandler(async (req, res, next) => {
 	} catch (e) {
 		utils.logError("a39gfoeuew", e);
 
-		res.json({success: false});
+		res.json({ success: false });
 	}
 
 	next();
@@ -99,7 +99,7 @@ router.get("/blocks/tip/height", asyncHandler(async (req, res, next) => {
 	} catch (e) {
 		utils.logError("234508ehede", e);
 
-		res.json({success: false});
+		res.json({ success: false });
 	}
 
 	next();
@@ -122,7 +122,7 @@ router.get("/block/:hashOrHeight", asyncHandler(async (req, res, next) => {
 	} catch (e) {
 		utils.logError("w9fgeddsuos", e);
 
-		res.json({success: false});
+		res.json({ success: false });
 	}
 
 	next();
@@ -144,7 +144,7 @@ router.get("/block/header/:hashOrHeight", asyncHandler(async (req, res, next) =>
 	} catch (e) {
 		utils.logError("w8kwqpoauns", e);
 
-		res.json({success: false});
+		res.json({ success: false });
 	}
 
 	next();
@@ -164,7 +164,7 @@ router.get("/tx/:txid", asyncHandler(async (req, res, next) => {
 		let results = await coreApi.getRawTransactionsWithInputs([txid], txInputLimit);
 		let outJson = results.transactions[0];
 		let txInputs = results.txInputsByTransaction[txid] || {};
-		
+
 		let inputBtc = 0;
 		if (txInputs[0]) {
 			for (let key in txInputs) {
@@ -175,10 +175,10 @@ router.get("/tx/:txid", asyncHandler(async (req, res, next) => {
 				outJson.vin[key].value = item.value;
 			}
 		}
-		
+
 		let outputBtc = 0;
-		for (let key in outJson.vout) {	
-			let item = outJson.vout[key];			
+		for (let key in outJson.vout) {
+			let item = outJson.vout[key];
 			outputBtc += item.value * global.coinConfig.baseCurrencyUnit.multiplier;
 		}
 
@@ -188,34 +188,34 @@ router.get("/tx/:txid", asyncHandler(async (req, res, next) => {
 		};
 
 		if (outJson.confirmations == null) {
-			outJson.mempool = await coreApi.getMempoolTxDetails(txid, false);		
-		} 
+			outJson.mempool = await coreApi.getMempoolTxDetails(txid, false);
+		}
 
 		if (global.specialTransactions && global.specialTransactions[txid]) {
 			let funInfo = global.specialTransactions[txid];
 			outJson.fun = funInfo;
 		}
-		
+
 		res.json(outJson);
-		
-	} catch(err) {
+
+	} catch (err) {
 		utils.logError("10328fwgdaqw", err);
-		res.json({success:false, error:err});
+		res.json({ success: false, error: err });
 	}
-	
+
 	next();
 
 }));
 
-router.get("/tx/volume/24h", function(req, res, next) {
+router.get("/tx/volume/24h", function (req, res, next) {
 	try {
 		if (networkVolume && networkVolume.d1 && networkVolume.d1.amt) {
 			let currencyValue = parseInt(networkVolume.d1.amt);
 
-			res.json({"24h": currencyValue});
+			res.json({ "24h": currencyValue });
 
 		} else {
-			res.json({success:false, error: "Volume data not yet loaded."});
+			res.json({ success: false, error: "Volume data not yet loaded." });
 		}
 
 		next();
@@ -223,8 +223,8 @@ router.get("/tx/volume/24h", function(req, res, next) {
 	} catch (err) {
 		utils.logError("39024y484", err);
 
-		res.json({success:false, error:err});
-		
+		res.json({ success: false, error: err });
+
 		next();
 	}
 });
@@ -262,7 +262,7 @@ router.get("/blockchain/coins", asyncHandler(async (req, res, next) => {
 
 router.get("/blockchain/utxo-set", asyncHandler(async (req, res, next) => {
 	const utxoSetSummary = await coreApi.getUtxoSetSummary(true, true);
-	
+
 	res.json(utxoSetSummary);
 
 	next();
@@ -295,7 +295,7 @@ router.get("/blockchain/next-halving", asyncHandler(async (req, res, next) => {
 
 		promises.push(utils.timePromise("homepage.getBlocksByHeight", async () => {
 			const latestBlocks = await coreApi.getBlocksByHeight(blockHeights);
-			
+
 			res.locals.latestBlocks = latestBlocks;
 		}));
 
@@ -323,8 +323,8 @@ router.get("/blockchain/next-halving", asyncHandler(async (req, res, next) => {
 
 	} catch (e) {
 		utils.logError("013923hege3", e)
-		
-		res.json({success:false});
+
+		res.json({ success: false });
 
 		next();
 	}
@@ -364,7 +364,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 			return;
 		}
 
-		const { perfId, perfResults } = utils.perfLogNewItem({action:"api.address"});
+		const { perfId, perfResults } = utils.perfLogNewItem({ action: "api.address" });
 		res.locals.perfId = perfId;
 
 		let limit = config.site.addressTxPageSize;
@@ -373,7 +373,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 
 		res.locals.maxTxOutputDisplayCount = config.site.addressPage.txOutputMaxDefaultDisplay;
 
-		
+
 		if (req.query.limit) {
 			limit = parseInt(req.query.limit);
 		}
@@ -389,7 +389,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 
 		const transactions = [];
 		const addressApiSupport = addressApi.getCurrentAddressApiFeatureSupport();
-		
+
 		const result = {};
 
 		let addressEncoding = "unknown";
@@ -401,7 +401,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 		if (address.match(/^[132mn].*$/)) {
 			try {
 				let base58Data = bitcoinjs.address.fromBase58Check(address);
-				result.base58 = {hash:base58Data.hash.toString("hex"), version:base58Data.version};
+				result.base58 = { hash: base58Data.hash.toString("hex"), version: base58Data.version };
 
 				addressEncoding = "base58";
 
@@ -413,7 +413,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 		if (addressEncoding == "unknown") {
 			try {
 				let bech32Data = bitcoinjs.address.fromBech32(address);
-				result.bech32 = {data:bech32Data.data.toString("hex"), version:bech32Data.version};
+				result.bech32 = { data: bech32Data.data.toString("hex"), version: bech32Data.version };
 
 				addressEncoding = "bech32";
 
@@ -425,7 +425,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 		if (addressEncoding == "unknown") {
 			try {
 				let bech32mData = bech32m.decode(address);
-				result.bech32m = {words:Buffer.from(bech32mData.words).toString("hex"), version:bech32mData.version};
+				result.bech32m = { words: Buffer.from(bech32mData.words).toString("hex"), version: bech32mData.version };
 
 				addressEncoding = "bech32m";
 
@@ -435,7 +435,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 		}
 
 		if (addressEncoding == "unknown") {
-			res.json({success:false, error:"Invalid address"});
+			res.json({ success: false, error: "Invalid address" });
 
 			next();
 
@@ -497,7 +497,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 		}, perfResults));
 
 		await utils.awaitPromises(promises);
-		
+
 		res.json(result);
 
 		next();
@@ -505,7 +505,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 	} catch (e) {
 		utils.logError("a39ehudsudese", e);
 
-		res.json({success:false});
+		res.json({ success: false });
 
 		next();
 	}
@@ -520,7 +520,7 @@ router.get("/address/:address", asyncHandler(async (req, res, next) => {
 // redirect for an old path
 router.get("/util/xyzpub/:extendedPubkey", asyncHandler(async (req, res, next) => {
 	const extendedPubkey = req.params.extendedPubkey;
-	
+
 	res.redirect(`${req.baseUrl}/xyzpub/${extendedPubkey}`);
 }));
 
@@ -529,18 +529,18 @@ router.get("/xyzpub/:extendedPubkey", asyncHandler(async (req, res, next) => {
 		const extendedPubkey = req.params.extendedPubkey;
 		res.locals.extendedPubkey = extendedPubkey;
 
-		
+
 		let limit = 20;
 		if (req.query.limit) {
 			limit = parseInt(req.query.limit);
 		}
-		
+
 		let offset = 0;
 		if (req.query.offset) {
 			offset = parseInt(req.query.offset);
 		}
 
-		
+
 		let relatedKeys = [];
 
 		let outputType = "Unknown";
@@ -577,7 +577,7 @@ router.get("/xyzpub/txids/:extendedPubkey", asyncHandler(async (req, res, next) 
 		if (req.query.limit) {
 			limit = parseInt(req.query.limit);
 		}
-		
+
 		const searchResult = await xyzpubApi.searchXpubTxids(extendedPubkey, gapLimit, limit);
 
 		let result = {
@@ -593,12 +593,12 @@ router.get("/xyzpub/txids/:extendedPubkey", asyncHandler(async (req, res, next) 
 				}
 			});
 		})
-		
+
 		if (searchResult) {
 			res.json(result);
 
 		} else {
-			res.json({success:false});
+			res.json({ success: false });
 		}
 
 		next();
@@ -606,7 +606,7 @@ router.get("/xyzpub/txids/:extendedPubkey", asyncHandler(async (req, res, next) 
 	} catch (e) {
 		utils.logError("382rdere", e);
 
-		res.json({success:false, error: e.toString()});
+		res.json({ success: false, error: e.toString() });
 
 		next();
 	}
@@ -630,22 +630,22 @@ router.get("/xyzpub/addresses/:extendedPubkey", asyncHandler(async (req, res, ne
 		if (req.query.offset) {
 			offset = parseInt(req.query.offset);
 		}
-		
+
 		const xyzpubResult = await xyzpubApi.getXpubAddresses(extendedPubkey, receiveOrChange, limit, offset);
-		
-		if (xyzpubResult){
+
+		if (xyzpubResult) {
 			res.json(xyzpubResult);
 
 		} else {
-			res.json({success:false});
+			res.json({ success: false });
 		}
 
 		next();
-		
+
 	} catch (e) {
 		utils.logError("3297rwegee", e);
 
-		res.json({success:false, error: e.toString()});
+		res.json({ success: false, error: e.toString() });
 
 		next();
 	}
@@ -686,7 +686,7 @@ router.get("/mining/hashrate", asyncHandler(async (req, res, next) => {
 				try {
 					const hashrate = await coreApi.getNetworkHashrate(x);
 					let summary = utils.formatLargeNumber(hashrate, decimals);
-					
+
 					rates[index] = {
 						val: parseFloat(summary[0]),
 
@@ -696,7 +696,7 @@ router.get("/mining/hashrate", asyncHandler(async (req, res, next) => {
 						unitMultiplier: summary[1].val,
 
 						raw: summary[0] * summary[1].val,
-						
+
 						string1: `${summary[0]}x10^${summary[1].exponent}`,
 						string2: `${summary[0]}e${summary[1].exponent}`,
 						string3: `${(summary[0] * summary[1].val).toLocaleString()}`
@@ -726,13 +726,13 @@ router.get("/mining/hashrate", asyncHandler(async (req, res, next) => {
 		utils.logError("23reuhd8uw92D", e);
 
 		res.json({
-			error: typeof(e) == "string" ? e : utils.stringifySimple(e)
+			error: typeof (e) == "string" ? e : utils.stringifySimple(e)
 		});
 	}
 }));
 
 router.get("/mining/diff-adj-estimate", asyncHandler(async (req, res, next) => {
-	const { perfId, perfResults } = utils.perfLogNewItem({action:"api.diff-adj-estimate"});
+	const { perfId, perfResults } = utils.perfLogNewItem({ action: "api.diff-adj-estimate" });
 	res.locals.perfId = perfId;
 
 	let promises = [];
@@ -740,18 +740,18 @@ router.get("/mining/diff-adj-estimate", asyncHandler(async (req, res, next) => {
 	let currentBlock;
 	let difficultyPeriod = parseInt(Math.floor(getblockchaininfo.blocks / coinConfig.difficultyAdjustmentBlockCount));
 	let difficultyPeriodFirstBlockHeader;
-	
+
 	promises.push(utils.timePromise("api.diff-adj-est.getBlockHeaderByHeight", async () => {
 		currentBlock = await coreApi.getBlockHeaderByHeight(getblockchaininfo.blocks);
 	}, perfResults));
-	
+
 	promises.push(utils.timePromise("api.diff-adj-est.getBlockHeaderByHeight2", async () => {
 		let h = coinConfig.difficultyAdjustmentBlockCount * difficultyPeriod;
 		difficultyPeriodFirstBlockHeader = await coreApi.getBlockHeaderByHeight(h);
 	}, perfResults));
 
 	await utils.awaitPromises(promises);
-	
+
 	let firstBlockHeader = difficultyPeriodFirstBlockHeader;
 	let heightDiff = currentBlock.height - firstBlockHeader.height;
 	let blockCount = heightDiff + 1;
@@ -768,7 +768,7 @@ router.get("/mining/diff-adj-estimate", asyncHandler(async (req, res, next) => {
 	if (blockRatioPercent < 25) {
 		blockRatioPercent = new Decimal(25);
 	}
-	
+
 	let diffAdjPercent = 0;
 	if (predictedBlockCount > blockCount) {
 		diffAdjPercent = new Decimal(100).minus(blockRatioPercent).times(-1);
@@ -777,7 +777,7 @@ router.get("/mining/diff-adj-estimate", asyncHandler(async (req, res, next) => {
 	} else {
 		diffAdjPercent = blockRatioPercent.minus(new Decimal(100));
 	}
-	
+
 	res.send(diffAdjPercent.toFixed(2).toString());
 }));
 
@@ -855,7 +855,7 @@ router.get("/mining/next-block/includes/:txid", asyncHandler(async (req, res, ne
 
 	await utils.awaitPromises(promises);
 
-	let response = {included:(txidIndex >= 0)};
+	let response = { included: (txidIndex >= 0) };
 	if (txidIndex >= 0) {
 		response.index = txidIndex;
 		response.txCount = txCount;
@@ -885,7 +885,7 @@ router.get("/mining/miner-summary", asyncHandler(async (req, res, next) => {
 	}
 
 	if (startHeight == -1 || endHeight == -1) {
-		res.json({success:false, error:"Unknown start or end height - use either 'since' (e.g. 'since=7d') or 'startHeight'+'endHeight' parameters to specify the blocks to analyze."});
+		res.json({ success: false, error: "Unknown start or end height - use either 'since' (e.g. 'since=7d') or 'startHeight'+'endHeight' parameters to specify the blocks to analyze." });
 
 		return;
 	}
@@ -901,17 +901,17 @@ router.get("/mining/miner-summary", asyncHandler(async (req, res, next) => {
 
 /// MEMPOOL
 
-router.get("/mempool/summary", function(req, res, next) {
-	coreApi.getMempoolInfo().then(function(info){
+router.get("/mempool/summary", function (req, res, next) {
+	coreApi.getMempoolInfo().then(function (info) {
 		res.json(info);
 	}).catch(next);
 });
 
 router.get("/mempool/fees", asyncHandler(async (req, res, next) => {
-	let feeConfTargets = [1, 3, 6, 144];	
+	let feeConfTargets = [1, 3, 6, 144];
 	let rawSmartFeeEstimates = await coreApi.getSmartFeeEstimates("CONSERVATIVE", feeConfTargets);
 	let smartFeeEstimates = {};
-	
+
 	for (let i = 0; i < feeConfTargets.length; i++) {
 		let rawSmartFeeEstimate = rawSmartFeeEstimates[i];
 		if (rawSmartFeeEstimate.errors) {
@@ -919,13 +919,13 @@ router.get("/mempool/fees", asyncHandler(async (req, res, next) => {
 		} else {
 			smartFeeEstimates[feeConfTargets[i]] = parseInt(new Decimal(rawSmartFeeEstimate.feerate).times(coinConfig.baseCurrencyUnit.multiplier).dividedBy(1000));
 		}
-	}		
-		
+	}
+
 	let results = {
-		"nextBlock":{"smart":smartFeeEstimates[1]},
-		"30min":smartFeeEstimates[3],
-		"60min":smartFeeEstimates[6],
-		"1day":smartFeeEstimates[144]
+		"nextBlock": { "smart": smartFeeEstimates[1] },
+		"30min": smartFeeEstimates[3],
+		"60min": smartFeeEstimates[6],
+		"1day": smartFeeEstimates[144]
 	};
 
 	let nextBlockEstimate = await coreApi.getNextBlockEstimate();
@@ -949,7 +949,7 @@ router.get("/mempool/fees", asyncHandler(async (req, res, next) => {
 
 const supportedCurrencies = ["usd", "eur", "gbp", "xau"];
 
-router.get("/price/sats", function(req, res, next) {
+router.get("/price/sats", function (req, res, next) {
 	let result = {};
 	let amount = 1.0;
 
@@ -970,25 +970,25 @@ router.get("/price/sats", function(req, res, next) {
 			let one = new Decimal(1);
 			dec = one.dividedBy(dec);
 			dec = dec.times(satCurrencyType.multiplier);
-			
+
 			result[currency] = dec.toFixed(0);
 		}
 	});
-	
+
 	res.json(result);
 
 	next();
 });
 
-router.get("/price/marketcap", function(req, res, next) {
+router.get("/price/marketcap", function (req, res, next) {
 	let result = 0;
 
 	if (!global.exchangeRates) {
 		result.success = false;
 		result.error = "You have exchange-rate requests disabled (this is the default state; in your server configuration, you must set BTCEXP_NO_RATES to 'false', and ensure that BTCEXP_PRIVACY_MODE is also still its default value of 'false')"
 	}
-	
-	coreApi.getBlockchainInfo().then(function(getblockchaininfo){
+
+	coreApi.getBlockchainInfo().then(function (getblockchaininfo) {
 		let estimatedSupply = utils.estimatedSupply(getblockchaininfo.blocks);
 		let price = 0;
 
@@ -1006,7 +1006,7 @@ router.get("/price/marketcap", function(req, res, next) {
 				let exchangedAmt = parseFloat(Math.round(dec * 100) / 100).toFixed(2);
 				price = exchangedAmt;
 			}
-		
+
 			result[currency] = estimatedSupply * price;
 		});
 
@@ -1017,7 +1017,7 @@ router.get("/price/marketcap", function(req, res, next) {
 	}).catch(next);
 });
 
-router.get("/price", function(req, res, next) {
+router.get("/price", function (req, res, next) {
 	let amount = 1.0;
 	let result = {};
 	let format = (req.query.format == "true");
@@ -1026,7 +1026,7 @@ router.get("/price", function(req, res, next) {
 		result.success = false;
 		result.error = "You have exchange-rate requests disabled (this is the default state; in your server configuration, you must set BTCEXP_NO_RATES to 'false', and ensure that BTCEXP_PRIVACY_MODE is also still its default value of 'false')"
 	}
-	
+
 	supportedCurrencies.forEach(currency => {
 		if (global.exchangeRates != null && global.exchangeRates[currency] != null) {
 			let formatData = utils.formatExchangedCurrency(amount, currency);
@@ -1044,8 +1044,8 @@ router.get("/price", function(req, res, next) {
 			result[currency] = utils.addThousandsSeparators(exchangedAmt);
 		}
 	});
-	
-	
+
+
 	res.json(result);
 
 	next();
@@ -1056,7 +1056,7 @@ router.get("/price", function(req, res, next) {
 
 /// FUN
 
-router.get("/quotes/random", function(req, res, next) {
+router.get("/quotes/random", function (req, res, next) {
 	let index = utils.randomInt(0, btcQuotes.items.length);
 
 	let quote = null;
@@ -1068,37 +1068,37 @@ router.get("/quotes/random", function(req, res, next) {
 
 		done = !utils.objHasProperty(quote, "duplicateIndex");
 	}
-	
+
 	res.json(quote);
 
 	next();
 });
 
-router.get("/quotes/all", function(req, res, next) {
+router.get("/quotes/all", function (req, res, next) {
 	res.json(btcQuotes.items);
 
 	next();
 });
 
-router.get("/quotes/:quoteIndex", function(req, res, next) {
+router.get("/quotes/:quoteIndex", function (req, res, next) {
 	if (!req.params.quoteIndex.match(/\d+/)) {
 		return;
 	}
 
 	let index = parseInt(req.params.quoteIndex);
-	
+
 	res.json(btcQuotes.items[index]);
 
 	next();
 });
 
-router.get("/holidays/all", function(req, res, next) {
+router.get("/holidays/all", function (req, res, next) {
 	res.json(global.btcHolidays.sortedItems);
 
 	next();
 });
 
-router.get("/holidays/today", function(req, res, next) {
+router.get("/holidays/today", function (req, res, next) {
 	let momentObj = moment.utc(new Date());
 	if (req.query.tzOffset) {
 		momentObj = momentObj.add(parseInt(req.query.tzOffset), "hours")
@@ -1106,16 +1106,16 @@ router.get("/holidays/today", function(req, res, next) {
 
 	let day = momentObj.format("MM-DD");
 	if (global.btcHolidays.byDay[day]) {
-		res.json({day: day, holidays: global.btcHolidays.byDay[day]});
+		res.json({ day: day, holidays: global.btcHolidays.byDay[day] });
 
 	} else {
-		res.json({day: day, holidays: []});
+		res.json({ day: day, holidays: [] });
 	}
 
 	next();
 });
 
-router.get("/holidays/:day", function(req, res, next) {
+router.get("/holidays/:day", function (req, res, next) {
 	if (!req.params.day.match(/^(\d{4}-)?\d{2}-\d{2}$/)) {
 		return;
 	}
@@ -1129,12 +1129,12 @@ router.get("/holidays/:day", function(req, res, next) {
 	} else if (req.params.day.match(/^\d{2}-\d{2}$/)) {
 		// already correct format
 	}
-	
+
 	if (global.btcHolidays.byDay[day]) {
-		res.json({day: day, holidays: global.btcHolidays.byDay[day]});
+		res.json({ day: day, holidays: global.btcHolidays.byDay[day] });
 
 	} else {
-		res.json({day: day, holidays: []});
+		res.json({ day: day, holidays: [] });
 	}
 
 	next();

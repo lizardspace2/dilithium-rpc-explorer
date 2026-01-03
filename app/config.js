@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug");
-const debugLog = debug("btcexp:config");
+const debugLog = debug("dilithiumexp:config");
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -10,7 +10,7 @@ const path = require('path');
 
 const apiDocs = require("../docs/api.js");
 
-let baseUrl = (process.env.BTCEXP_BASEURL || "/").trim();
+let baseUrl = (process.env.DILITHIUMEXP_BASEURL || "/").trim();
 if (!baseUrl.startsWith("/")) {
 	baseUrl = "/" + baseUrl;
 }
@@ -19,12 +19,12 @@ if (!baseUrl.endsWith("/")) {
 }
 
 
-let cdnBaseUrl = (process.env.BTCEXP_CDN_BASE_URL || ".").trim();
+let cdnBaseUrl = (process.env.DILITHIUMEXP_CDN_BASE_URL || ".").trim();
 while (cdnBaseUrl.endsWith("/")) {
 	cdnBaseUrl = cdnBaseUrl.substring(0, cdnBaseUrl.length - 1);
 }
 
-let s3BucketPath = (process.env.BTCEXP_S3_BUCKET_PATH || "").trim();
+let s3BucketPath = (process.env.DILITHIUMEXP_S3_BUCKET_PATH || "").trim();
 while (s3BucketPath.endsWith("/")) {
 	s3BucketPath = s3BucketPath.substring(0, s3BucketPath.length - 1);
 }
@@ -33,18 +33,18 @@ while (s3BucketPath.endsWith("/")) {
 const coins = require("./coins.js");
 const credentials = require("./credentials.js");
 
-const currentCoin = process.env.BTCEXP_COIN || (process.env.BTCEXP_IS_DILITHIUM == "true" ? "DIL" : "BTC");
+const currentCoin = process.env.DILITHIUMEXP_COIN || (process.env.DILITHIUMEXP_IS_DILITHIUM == "true" ? "DIL" : "DIL");
 
 const rpcCred = credentials.rpc;
 
 
-const cookieSecret = process.env.BTCEXP_COOKIE_SECRET
+const cookieSecret = process.env.DILITHIUMEXP_COOKIE_SECRET
 	|| (rpcCred.password && crypto.createHmac('sha256', JSON.stringify(rpcCred))
-		.update('btc-rpc-explorer-cookie-secret').digest('hex'))
+		.update('dilithium-rpc-explorer-cookie-secret').digest('hex'))
 	|| "0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f";
 
 
-const electrumServerUriStrings = (process.env.BTCEXP_ELECTRUM_SERVERS || process.env.BTCEXP_ELECTRUMX_SERVERS || "").split(',').filter(Boolean);
+const electrumServerUriStrings = (process.env.DILITHIUMEXP_ELECTRUM_SERVERS || process.env.DILITHIUMEXP_ELECTRUMX_SERVERS || "").split(',').filter(Boolean);
 const electrumServers = [];
 for (let i = 0; i < electrumServerUriStrings.length; i++) {
 	const uri = url.parse(electrumServerUriStrings[i]);
@@ -54,12 +54,12 @@ for (let i = 0; i < electrumServerUriStrings.length; i++) {
 
 // default=false env vars
 [
-	"BTCEXP_DEMO",
-	"BTCEXP_PRIVACY_MODE",
-	"BTCEXP_NO_INMEMORY_RPC_CACHE",
-	"BTCEXP_RPC_ALLOWALL",
-	"BTCEXP_ELECTRUM_TXINDEX",
-	"BTCEXP_UI_HIDE_INFO_NOTES",
+	"DILITHIUMEXP_DEMO",
+	"DILITHIUMEXP_PRIVACY_MODE",
+	"DILITHIUMEXP_NO_INMEMORY_RPC_CACHE",
+	"DILITHIUMEXP_RPC_ALLOWALL",
+	"DILITHIUMEXP_ELECTRUM_TXINDEX",
+	"DILITHIUMEXP_UI_HIDE_INFO_NOTES",
 
 ].forEach(function (item) {
 	if (process.env[item] === undefined) {
@@ -72,8 +72,8 @@ for (let i = 0; i < electrumServerUriStrings.length; i++) {
 
 // default=true env vars
 [
-	"BTCEXP_NO_RATES",
-	"BTCEXP_SLOW_DEVICE_MODE"
+	"DILITHIUMEXP_NO_RATES",
+	"DILITHIUMEXP_SLOW_DEVICE_MODE"
 
 ].forEach(function (item) {
 	if (process.env[item] === undefined) {
@@ -83,12 +83,12 @@ for (let i = 0; i < electrumServerUriStrings.length; i++) {
 	}
 });
 
-const slowDeviceMode = (process.env.BTCEXP_SLOW_DEVICE_MODE.toLowerCase() == "true");
+const slowDeviceMode = (process.env.DILITHIUMEXP_SLOW_DEVICE_MODE.toLowerCase() == "true");
 
 module.exports = {
-	host: process.env.BTCEXP_HOST || "127.0.0.1",
-	port: process.env.PORT || process.env.BTCEXP_PORT || 3002,
-	secureSite: process.env.BTCEXP_SECURE_SITE == "true",
+	host: process.env.DILITHIUMEXP_HOST || "127.0.0.1",
+	port: process.env.PORT || process.env.DILITHIUMEXP_PORT || 3002,
+	secureSite: process.env.DILITHIUMEXP_SECURE_SITE == "true",
 
 	baseUrl: baseUrl,
 	apiBaseUrl: apiDocs.baseUrl,
@@ -96,44 +96,44 @@ module.exports = {
 	coin: currentCoin,
 
 	displayDefaults: {
-		displayCurrency: (process.env.BTCEXP_DISPLAY_CURRENCY || "btc"),
-		localCurrency: (process.env.BTCEXP_LOCAL_CURRENCY || "usd"),
-		theme: (process.env.BTCEXP_UI_THEME || "dark"),
-		timezone: (process.env.BTCEXP_UI_TIMEZONE || "local")
+		displayCurrency: (process.env.DILITHIUMEXP_DISPLAY_CURRENCY || "dil"),
+		localCurrency: (process.env.DILITHIUMEXP_LOCAL_CURRENCY || "usd"),
+		theme: (process.env.DILITHIUMEXP_UI_THEME || "dark"),
+		timezone: (process.env.DILITHIUMEXP_UI_TIMEZONE || "local")
 	},
 
 	cookieSecret: cookieSecret,
 
-	privacyMode: (process.env.BTCEXP_PRIVACY_MODE.toLowerCase() == "true"),
+	privacyMode: (process.env.DILITHIUMEXP_PRIVACY_MODE.toLowerCase() == "true"),
 	slowDeviceMode: slowDeviceMode,
-	demoSite: (process.env.BTCEXP_DEMO.toLowerCase() == "true"),
-	queryExchangeRates: (process.env.BTCEXP_NO_RATES.toLowerCase() != "true" && process.env.BTCEXP_PRIVACY_MODE.toLowerCase() != "true"),
-	noInmemoryRpcCache: (process.env.BTCEXP_NO_INMEMORY_RPC_CACHE.toLowerCase() == "true"),
+	demoSite: (process.env.DILITHIUMEXP_DEMO.toLowerCase() == "true"),
+	queryExchangeRates: (process.env.DILITHIUMEXP_NO_RATES.toLowerCase() != "true" && process.env.DILITHIUMEXP_PRIVACY_MODE.toLowerCase() != "true"),
+	noInmemoryRpcCache: (process.env.DILITHIUMEXP_NO_INMEMORY_RPC_CACHE.toLowerCase() == "true"),
 
-	btcExpIsDilithium: (process.env.BTCEXP_IS_DILITHIUM == "true"),
+	btcExpIsDilithium: (process.env.DILITHIUMEXP_IS_DILITHIUM == "true"),
 
-	rpcConcurrency: (process.env.BTCEXP_RPC_CONCURRENCY || (slowDeviceMode ? 3 : 10)),
+	rpcConcurrency: (process.env.DILITHIUMEXP_RPC_CONCURRENCY || (slowDeviceMode ? 3 : 10)),
 
-	filesystemCacheDir: (process.env.BTCEXP_FILESYSTEM_CACHE_DIR || path.join(process.cwd(), "./cache")),
+	filesystemCacheDir: (process.env.DILITHIUMEXP_FILESYSTEM_CACHE_DIR || path.join(process.cwd(), "./cache")),
 
-	noTxIndexSearchDepth: (+process.env.BTCEXP_NOTXINDEX_SEARCH_DEPTH || 3),
+	noTxIndexSearchDepth: (+process.env.DILITHIUMEXP_NOTXINDEX_SEARCH_DEPTH || 3),
 
 	cdn: {
 		active: (cdnBaseUrl == "." ? false : true),
-		s3Bucket: process.env.BTCEXP_S3_BUCKET,
-		s3BucketRegion: process.env.BTCEXP_S3_BUCKET_REGION,
+		s3Bucket: process.env.DILITHIUMEXP_S3_BUCKET,
+		s3BucketRegion: process.env.DILITHIUMEXP_S3_BUCKET_REGION,
 		s3BucketPath: s3BucketPath,
 		baseUrl: cdnBaseUrl
 	},
 
 	rateLimiting: {
-		windowMinutes: process.env.BTCEXP_RATE_LIMIT_WINDOW_MINUTES || 15,
-		windowMaxRequests: process.env.BTCEXP_RATE_LIMIT_WINDOW_MAX_REQUESTS || 200
+		windowMinutes: process.env.DILITHIUMEXP_RATE_LIMIT_WINDOW_MINUTES || 15,
+		windowMaxRequests: process.env.DILITHIUMEXP_RATE_LIMIT_WINDOW_MAX_REQUESTS || 200
 	},
 
 	rpcBlacklist:
-		process.env.BTCEXP_RPC_ALLOWALL.toLowerCase() == "true" ? []
-			: process.env.BTCEXP_RPC_BLACKLIST ? process.env.BTCEXP_RPC_BLACKLIST.split(',').filter(Boolean)
+		process.env.DILITHIUMEXP_RPC_ALLOWALL.toLowerCase() == "true" ? []
+			: process.env.DILITHIUMEXP_RPC_BLACKLIST ? process.env.DILITHIUMEXP_RPC_BLACKLIST.split(',').filter(Boolean)
 				: [
 					"addnode",
 					"backupwallet",
@@ -206,21 +206,21 @@ module.exports = {
 					"walletpassphrasechange",
 				],
 
-	addressApi: process.env.BTCEXP_ADDRESS_API,
-	electrumTxIndex: process.env.BTCEXP_ELECTRUM_TXINDEX != "false",
+	addressApi: process.env.DILITHIUMEXP_ADDRESS_API,
+	electrumTxIndex: process.env.DILITHIUMEXP_ELECTRUM_TXINDEX != "false",
 	electrumServers: electrumServers,
 
-	redisUrl: process.env.BTCEXP_REDIS_URL,
+	redisUrl: process.env.DILITHIUMEXP_REDIS_URL,
 
 	site: {
-		hideInfoNotes: process.env.BTCEXP_UI_HIDE_INFO_NOTES,
+		hideInfoNotes: process.env.DILITHIUMEXP_UI_HIDE_INFO_NOTES,
 		homepage: {
-			recentBlocksCount: parseInt(process.env.BTCEXP_UI_HOME_PAGE_LATEST_BLOCKS_COUNT || (slowDeviceMode ? 5 : 10))
+			recentBlocksCount: parseInt(process.env.DILITHIUMEXP_UI_HOME_PAGE_LATEST_BLOCKS_COUNT || (slowDeviceMode ? 5 : 10))
 		},
 		blockTxPageSize: (slowDeviceMode ? 10 : 20),
 		addressTxPageSize: 10,
 		txMaxInput: (slowDeviceMode ? 3 : 15),
-		browseBlocksPageSize: parseInt(process.env.BTCEXP_UI_BLOCKS_PAGE_BLOCK_COUNT || (slowDeviceMode ? 10 : 25)),
+		browseBlocksPageSize: parseInt(process.env.DILITHIUMEXP_UI_BLOCKS_PAGE_BLOCK_COUNT || (slowDeviceMode ? 10 : 25)),
 		browseMempoolTransactionsPageSize: (slowDeviceMode ? 10 : 25),
 		addressPage: {
 			txOutputMaxDefaultDisplay: 10
@@ -258,7 +258,7 @@ module.exports = {
 	/* 11 */	{ name: "Block Analysis", url: "./block-analysis", desc: "Summary analysis for all transactions in a block.", iconClass: "bi-chevron-double-down" },
 	/* 12 */	{ name: "Difficulty History", url: "./difficulty-history", desc: "Details of difficulty changes over time.", iconClass: "bi-clock-history" },
 
-	/* 13 */	{ name: "Whitepaper Extractor", url: "./bitcoin-whitepaper", desc: "Extract the Dilithium whitepaper from data embedded within the blockchain.", iconClass: "bi-file-earmark-text" },
+	/* 13 */	{ name: "Whitepaper Extractor", url: "./dilithium-whitepaper", desc: "Extract the Dilithium whitepaper from data embedded within the blockchain.", iconClass: "bi-file-earmark-text" },
 
 	/* 14 */	{ name: "Predicted Blocks", url: "./predicted-blocks", desc: "View predicted future blocks based on the current mempool.", iconClass: "bi-arrow-right-circle" },
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 var debug = require("debug");
-var debugLog = debug("btcexp:config");
+var debugLog = debug("dilithiumexp:config");
 
 // to debug arg settings, enable the below line:
-//debug.enable("btcexp:*");
+//debug.enable("dilithiumexp:*");
 
 const args = require('meow')(`
 	Usage
-	  $ btc-rpc-explorer [options]
+	  $ dilithium-rpc-explorer [options]
 
 	Options
 	  -p, --port <port>			  port to bind http server [default: 3002]
@@ -43,15 +43,15 @@ const args = require('meow')(`
 	  -v, --version				  output version number
 
 	Examples
-	  $ btc-rpc-explorer --port 8080 --bitcoind-port 18443 --bitcoind-cookie ~/.bitcoin/regtest/.cookie
-	  $ btc-rpc-explorer -p 8080 -P 18443 -c ~/.bitcoin/regtest.cookie
+	  $ dilithium-rpc-explorer --port 8080 --bitcoind-port 18443 --bitcoind-cookie ~/.bitcoin/regtest/.cookie
+	  $ dilithium-rpc-explorer -p 8080 -P 18443 -c ~/.bitcoin/regtest.cookie
 
 	Or using connection URIs
-	  $ btc-rpc-explorer -b bitcoin://bob:myPassword@127.0.0.1:18443/
-	  $ btc-rpc-explorer -b bitcoin://127.0.0.1:18443/?cookie=$HOME/.bitcoin/regtest/.cookie
+	  $ dilithium-rpc-explorer -b bitcoin://bob:myPassword@127.0.0.1:18443/
+	  $ dilithium-rpc-explorer -b bitcoin://127.0.0.1:18443/?cookie=$HOME/.bitcoin/regtest/.cookie
 
 	All options may also be specified as environment variables
-	  $ BTCEXP_PORT=8080 BTCEXP_BITCOIND_PORT=18443 BTCEXP_BITCOIND_COOKIE=~/.bitcoin/regtest/.cookie btc-rpc-explorer
+	  $ DILITHIUMEXP_PORT=8080 DILITHIUMEXP_BITCOIND_PORT=18443 DILITHIUMEXP_BITCOIND_COOKIE=~/.bitcoin/regtest/.cookie dilithium-rpc-explorer
 
 
 `, {
@@ -80,14 +80,14 @@ const envify = k => k.replace(/([A-Z])/g, '_$1').toUpperCase();
 
 Object.keys(args).filter(k => k.length > 1).forEach(k => {
 	if (args[k] === false) {
-		debugLog(`Config(arg): BTCEXP_NO_${envify(k)}=true`);
+		debugLog(`Config(arg): DILITHIUMEXP_NO_${envify(k)}=true`);
 
-		process.env[`BTCEXP_NO_${envify(k)}`] = true;
+		process.env[`DILITHIUMEXP_NO_${envify(k)}`] = true;
 
 	} else {
-		debugLog(`Config(arg): BTCEXP_${envify(k)}=${args[k]}`);
+		debugLog(`Config(arg): DILITHIUMEXP_${envify(k)}=${args[k]}`);
 
-		process.env[`BTCEXP_${envify(k)}`] = args[k];
+		process.env[`DILITHIUMEXP_${envify(k)}`] = args[k];
 	}
 });
 

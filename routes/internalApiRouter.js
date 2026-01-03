@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug");
-const debugLog = debug("btcexp:router");
+const debugLog = debug("dilithiumexp:router");
 
 const express = require('express');
 const router = express.Router();
@@ -24,50 +24,50 @@ const rpcApi = require("./../app/api/rpcApi.js");
 
 
 
-router.get("/blocks-by-height/:blockHeights", function(req, res, next) {
+router.get("/blocks-by-height/:blockHeights", function (req, res, next) {
 	let blockHeightStrs = req.params.blockHeights.split(",");
-	
+
 	let blockHeights = [];
 	for (let i = 0; i < blockHeightStrs.length; i++) {
 		blockHeights.push(parseInt(blockHeightStrs[i]));
 	}
 
-	coreApi.getBlocksByHeight(blockHeights).then(function(result) {
+	coreApi.getBlocksByHeight(blockHeights).then(function (result) {
 		res.json(result);
 	}).catch(next);
 });
 
-router.get("/block-headers-by-height/:blockHeights", function(req, res, next) {
+router.get("/block-headers-by-height/:blockHeights", function (req, res, next) {
 	let blockHeightStrs = req.params.blockHeights.split(",");
-	
+
 	let blockHeights = [];
 	for (let i = 0; i < blockHeightStrs.length; i++) {
 		blockHeights.push(parseInt(blockHeightStrs[i]));
 	}
 
-	coreApi.getBlockHeadersByHeight(blockHeights).then(function(result) {
+	coreApi.getBlockHeadersByHeight(blockHeights).then(function (result) {
 		res.json(result);
 
 		next();
 	});
 });
 
-router.get("/block-stats-by-height/:blockHeights", function(req, res, next) {
+router.get("/block-stats-by-height/:blockHeights", function (req, res, next) {
 	let blockHeightStrs = req.params.blockHeights.split(",");
-	
+
 	let blockHeights = [];
 	for (let i = 0; i < blockHeightStrs.length; i++) {
 		blockHeights.push(parseInt(blockHeightStrs[i]));
 	}
 
-	coreApi.getBlocksStatsByHeight(blockHeights).then(function(result) {
+	coreApi.getBlocksStatsByHeight(blockHeights).then(function (result) {
 		res.json(result);
 
 		next();
 	});
 });
 
-router.get("/mempool-txs/:txids", function(req, res, next) {
+router.get("/mempool-txs/:txids", function (req, res, next) {
 	let txids = req.params.txids.split(",").map(utils.asHash);
 
 	let promises = [];
@@ -76,13 +76,13 @@ router.get("/mempool-txs/:txids", function(req, res, next) {
 		promises.push(coreApi.getMempoolTxDetails(txids[i], false));
 	}
 
-	Promise.all(promises).then(function(results) {
+	Promise.all(promises).then(function (results) {
 		res.json(results);
 
 		next();
 
-	}).catch(function(err) {
-		res.json({success:false, error:err});
+	}).catch(function (err) {
+		res.json({ success: false, error: err });
 
 		next();
 	});
@@ -94,7 +94,7 @@ router.get("/difficulty-by-height/:blockHeights", asyncHandler(async (req, res, 
 	const blockHeights = req.params.blockHeights.split(",").map(x => parseInt(x));
 
 	let results = await coreApi.getDifficultyByBlockHeights(blockHeights);
-	
+
 	res.json(results);
 
 	next();
@@ -124,7 +124,7 @@ router.get("/get-predicted-blocks", asyncHandler(async (req, res, next) => {
 
 	if (statusId && predictedBlocksOutputs[statusId]) {
 		let output = predictedBlocksOutputs[statusId];
-		
+
 		res.json(output);
 
 		next();
@@ -150,7 +150,7 @@ router.get("/build-predicted-blocks", asyncHandler(async (req, res, next) => {
 			predictedBlocksStatuses[statusId] = {};
 		}
 
-		res.json({success:true, status:"started"});
+		res.json({ success: true, status: "started" });
 
 		next();
 
@@ -191,7 +191,7 @@ router.get("/get-mempool-summary", asyncHandler(async (req, res, next) => {
 
 	if (statusId && mempoolSummaries[statusId]) {
 		let summary = mempoolSummaries[statusId];
-		
+
 		res.json(summary);
 
 		next();
@@ -218,7 +218,7 @@ router.get("/build-mempool-summary", asyncHandler(async (req, res, next) => {
 			mempoolSummaryStatuses[statusId] = {};
 		}
 
-		
+
 		const ageBuckets = req.query.ageBuckets ? parseInt(req.query.ageBuckets) : 100;
 		const sizeBuckets = req.query.sizeBuckets ? parseInt(req.query.sizeBuckets) : 100;
 
@@ -231,7 +231,7 @@ router.get("/build-mempool-summary", asyncHandler(async (req, res, next) => {
 		mempoolSummaries[statusId] = summary;
 
 
-		res.json({success:true, status:"started"});
+		res.json({ success: true, status: "started" });
 
 		next();
 
@@ -265,7 +265,7 @@ router.get("/get-mining-summary", asyncHandler(async (req, res, next) => {
 
 	if (statusId && miningSummaries[statusId]) {
 		let summary = miningSummaries[statusId];
-		
+
 		res.json(summary);
 
 		next();
@@ -295,10 +295,10 @@ router.get("/build-mining-summary/:startBlock/:endBlock", asyncHandler(async (re
 			miningSummaryStatuses[statusId] = {};
 		}
 
-		res.json({success:true, status:"started"});
+		res.json({ success: true, status: "started" });
 
 		next();
-		
+
 
 
 		let summary = await coreApi.buildMiningSummary(statusId, startBlock, endBlock, (update) => {
@@ -343,7 +343,7 @@ router.get("/mempool-tx-summaries/:txids", asyncHandler(async (req, res, next) =
 					};
 
 					results.push(itemSummary);
-					
+
 					resolve();
 
 				} catch (e) {
@@ -362,32 +362,32 @@ router.get("/mempool-tx-summaries/:txids", asyncHandler(async (req, res, next) =
 		next();
 
 	} catch (err) {
-		res.json({success:false, error:err});
+		res.json({ success: false, error: err });
 
 		next();
 	}
 }));
 
-router.get("/raw-tx-with-inputs/:txid", function(req, res, next) {
+router.get("/raw-tx-with-inputs/:txid", function (req, res, next) {
 	let txid = utils.asHash(req.params.txid);
 
 	let promises = [];
 
 	promises.push(coreApi.getRawTransactionsWithInputs([txid]));
 
-	Promise.all(promises).then(function(results) {
+	Promise.all(promises).then(function (results) {
 		res.json(results);
 
 		next();
 
-	}).catch(function(err) {
-		res.json({success:false, error:err});
+	}).catch(function (err) {
+		res.json({ success: false, error: err });
 
 		next();
 	});
 });
 
-router.get("/block-tx-summaries/:blockHash/:blockHeight/:txids", function(req, res, next) {
+router.get("/block-tx-summaries/:blockHash/:blockHeight/:txids", function (req, res, next) {
 	let blockHash = req.params.blockHash;
 	let blockHeight = parseInt(req.params.blockHeight);
 	let txids = req.params.txids.split(",").map(utils.asHash);
@@ -396,23 +396,23 @@ router.get("/block-tx-summaries/:blockHash/:blockHeight/:txids", function(req, r
 
 	let results = [];
 
-	promises.push(new Promise(function(resolve, reject) {
+	promises.push(new Promise(function (resolve, reject) {
 		coreApi.buildBlockAnalysisData(blockHeight, blockHash, txids, 0, results, resolve);
 	}));
 
-	Promise.all(promises).then(function() {
+	Promise.all(promises).then(function () {
 		res.json(results);
 
 		next();
 
-	}).catch(function(err) {
-		res.json({success:false, error:err});
+	}).catch(function (err) {
+		res.json({ success: false, error: err });
 
 		next();
 	});
 });
 
-router.get("/utils/:func/:params", function(req, res, next) {
+router.get("/utils/:func/:params", function (req, res, next) {
 	let func = req.params.func;
 	let params = req.params.params;
 
@@ -433,7 +433,7 @@ router.get("/utils/:func/:params", function(req, res, next) {
 		data = utils.formatCurrencyAmountInSmallestUnits(new Decimal(parts[0]), parseInt(parts[1]));
 
 	} else {
-		data = {success:false, error:`Unknown function: ${func}`};
+		data = { success: false, error: `Unknown function: ${func}` };
 	}
 
 	res.json(data);

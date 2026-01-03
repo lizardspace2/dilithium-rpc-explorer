@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug");
-const debugLog = debug("btcexp:cleanup");
+const debugLog = debug("dilithiumexp:cleanup");
 
 const express = require('express');
 const csrfApi = require('csurf');
@@ -26,14 +26,14 @@ const config = require("./../app/config.js");
 const coreApi = require("./../app/api/coreApi.js");
 const addressApi = require("./../app/api/addressApi.js");
 const rpcApi = require("./../app/api/rpcApi.js");
-const btcQuotes = require("./../app/coins/btcQuotes.js");
+const dilithiumQuotes = require("./../app/coins/dilithiumQuotes.js");
 
 
 
 function logUrlError(req, type) {
 	let userAgent = req.headers['user-agent'];
 
-	utils.logError(`DoubleUrl`, null, {"type": "block/block", "userAgent":userAgent}, false);
+	utils.logError(`DoubleUrl`, null, { "type": "block/block", "userAgent": userAgent }, false);
 }
 
 

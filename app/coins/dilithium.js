@@ -3,7 +3,7 @@
 const Decimal = require("decimal.js");
 const Decimal8 = Decimal.clone({ precision: 8, rounding: 8 });
 
-const btcFun = require("./btcFun.js");
+const dilithiumFun = require("./dilithiumFun.js");
 
 const blockRewardEras = [new Decimal8(50)];
 for (let i = 1; i < 34; i++) {
@@ -96,12 +96,7 @@ module.exports = {
 		test: "22e7e860660f368b5c653c272b0445a0625d19fdec02fc158ef9800a5c3a07e8",
 		signet: "39332e10af6fe491e8ae4ba1e2dd674698fedf8aa3c8c42bf71572debc1bb5b9"
 	},
-	miningPoolsConfigUrls: [
-		"https://raw.githubusercontent.com/btc21/Bitcoin-Known-Miners/master/miners.json",
-		"https://raw.githubusercontent.com/bitcoin-data/mining-pools/generated/pools.json",
-		"https://raw.githubusercontent.com/btccom/Blockchain-Known-Pools/master/pools.json",
-		"https://raw.githubusercontent.com/blockchain/Blockchain-Known-Pools/master/pools.json"
-	],
+	miningPoolsConfigUrls: [],
 	maxBlockWeight: 4000000,
 	maxBlockSize: 1000000,
 	minTxBytes: 166, // ref: https://en.bitcoin.it/wiki/Maximum_transaction_rate
@@ -523,7 +518,7 @@ module.exports = {
 		}
 	},
 	genesisCoinbaseOutputAddressScripthash: "8b01df4e368ea28f8dc0423bcf7a4923e3a12d307c875e47a0cfbf90b5c39161",
-	historicalData: btcFun.items,
+	historicalData: dilithiumFun.items,
 	exchangeRateData: {
 		jsonUrl: "https://api.coindesk.com/v1/bpi/currentprice.json",
 		responseBodySelectorFunction: function (responseBody) {

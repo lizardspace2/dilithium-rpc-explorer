@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug");
-const debugLog = debug("btcexp:router");
+const debugLog = debug("dilithiumexp:router");
 
 const fs = require('fs');
 const v8 = require('v8');
@@ -30,7 +30,7 @@ const appStats = require("./../app/appStats.js");
 
 
 
-router.get("/dashboard", function(req, res, next) {
+router.get("/dashboard", function (req, res, next) {
 	res.locals.appStartTime = global.appStartTime;
 	res.locals.memstats = v8.getHeapStatistics();
 	res.locals.rpcStats = global.rpcStats;
@@ -75,17 +75,17 @@ router.get("/dashboard", function(req, res, next) {
 	next();
 });
 
-router.get("/os-stats", function(req, res, next) {
+router.get("/os-stats", function (req, res, next) {
 	res.locals.appStats = appStats.getAllAppStats();
 	res.locals.appStatNames = appStats.statNames;
-	
+
 
 	res.render("admin/os-stats");
 
 	next();
 });
 
-router.get("/perf-log", function(req, res, next) {
+router.get("/perf-log", function (req, res, next) {
 	res.locals.perfLog = utils.perfLog;
 
 	res.render("admin/perf-log");
@@ -94,10 +94,10 @@ router.get("/perf-log", function(req, res, next) {
 });
 
 
-router.get("/app-stats", function(req, res, next) {
+router.get("/app-stats", function (req, res, next) {
 	res.locals.stats = statTracker.currentStats();
-	
-	
+
+
 	res.locals.performanceStats = [];
 	for (const [key, value] of Object.entries(res.locals.stats.performance)) {
 		res.locals.performanceStats.push([key, value]);
@@ -126,7 +126,7 @@ router.get("/app-stats", function(req, res, next) {
 	res.locals.valueStats.sort((a, b) => {
 		return a[0].localeCompare(b[0]);
 	});
-	
+
 
 	res.render("admin/app-stats");
 
@@ -136,9 +136,9 @@ router.get("/app-stats", function(req, res, next) {
 
 router.get('/resetUserSettings', (req, res) => {
 	req.session.userSettings = Object.create(null);
- 
+
 	let userSettings = Object.create(null);
-	
+
 	res.cookie("user-settings", JSON.stringify(userSettings));
 
 	res.redirect(req.headers.referer);
@@ -155,10 +155,10 @@ router.get('/heapdump', (req, res) => {
 		const heapdumpStream = v8.getHeapSnapshot();
 		const fileStream = fs.createWriteStream(filename);
 		heapdumpStream.pipe(fileStream);
-		
+
 		debugLog("Heap dump at startup written to", filename);
 
-		res.status(200).send({msg: "successfully took a heap dump"});
+		res.status(200).send({ msg: "successfully took a heap dump" });
 	}
 });
 

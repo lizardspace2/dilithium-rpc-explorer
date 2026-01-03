@@ -11,14 +11,14 @@ const debug = require("debug");
 
 
 // start with this, we will update after loading any .env files
-const debugDefaultCategories = "btcexp:app,btcexp:error,btcexp:errorVerbose";
+const debugDefaultCategories = "dilithiumexp:app,dilithiumexp:error,dilithiumexp:errorVerbose";
 debug.enable(debugDefaultCategories);
 
 
-const debugLog = debug("btcexp:app");
-const debugErrorLog = debug("btcexp:error");
-const debugPerfLog = debug("btcexp:actionPerformace");
-const debugAccessLog = debug("btcexp:access");
+const debugLog = debug("dilithiumexp:app");
+const debugErrorLog = debug("dilithiumexp:error");
+const debugPerfLog = debug("dilithiumexp:actionPerformace");
+const debugAccessLog = debug("dilithiumexp:access");
 
 const configPaths = [
 	path.join(os.homedir(), ".config", "btc-rpc-explorer.env"),
@@ -91,8 +91,8 @@ const qrcode = require("qrcode");
 const addressApi = require("./app/api/addressApi.js");
 const electrumAddressApi = require("./app/api/electrumAddressApi.js");
 const appStats = require("./app/appStats.js");
-const btcQuotes = require("./app/coins/btcQuotes.js");
-const btcHolidays = require("./app/coins/btcHolidays.js");
+const dilithiumQuotes = require("./app/coins/dilithiumQuotes.js");
+const dilithiumHolidays = require("./app/coins/dilithiumHolidays.js");
 const auth = require('./app/auth.js');
 const sso = require('./app/sso.js');
 const markdown = require("markdown-it")();
@@ -117,7 +117,7 @@ global.appVersion = package_json.version;
 global.cacheId = global.appVersion;
 debugLog(`Default cacheId '${global.cacheId}'`);
 
-global.btcNodeSemver = "0.0.0";
+global.dilithiumNodeSemver = "0.0.0";
 
 
 const cleanupRouter = require('./routes/cleanupRouter.js');
@@ -127,6 +127,8 @@ const apiActionsRouter = require('./routes/apiRouter.js');
 const snippetActionsRouter = require('./routes/snippetRouter.js');
 const adminActionsRouter = require('./routes/adminRouter.js');
 const testActionsRouter = require('./routes/testRouter.js');
+
+loadHolidays();
 
 const expressApp = express();
 
@@ -454,25 +456,25 @@ function loadHistoricalDataForChain(chain) {
 function loadHolidays(chain) {
 	debugLog(`Loading holiday data`);
 
-	global.btcHolidays = btcHolidays;
-	global.btcHolidays.byDay = {};
-	global.btcHolidays.sortedDays = [];
-	global.btcHolidays.sortedItems = [...btcHolidays.items];
-	global.btcHolidays.sortedItems.sort((a, b) => a.date.localeCompare(b.date));
+	global.dilithiumHolidays = dilithiumHolidays;
+	global.dilithiumHolidays.byDay = {};
+	global.dilithiumHolidays.sortedDays = [];
+	global.dilithiumHolidays.sortedItems = [...dilithiumHolidays.items];
+	global.dilithiumHolidays.sortedItems.sort((a, b) => a.date.localeCompare(b.date));
 
-	global.btcHolidays.items.forEach(function (item) {
+	global.dilithiumHolidays.items.forEach(function (item) {
 		let day = item.date.substring(5);
 
-		if (!global.btcHolidays.sortedDays.includes(day)) {
-			global.btcHolidays.sortedDays.push(day);
-			global.btcHolidays.sortedDays.sort();
+		if (!global.dilithiumHolidays.sortedDays.includes(day)) {
+			global.dilithiumHolidays.sortedDays.push(day);
+			global.dilithiumHolidays.sortedDays.sort();
 		}
 
-		if (global.btcHolidays.byDay[day] == undefined) {
-			global.btcHolidays.byDay[day] = [];
+		if (global.dilithiumHolidays.byDay[day] == undefined) {
+			global.dilithiumHolidays.byDay[day] = [];
 		}
 
-		global.btcHolidays.byDay[day].push(item);
+		global.dilithiumHolidays.byDay[day].push(item);
 	});
 }
 
@@ -518,11 +520,11 @@ async function onRpcConnectionVerified(getnetworkinfo, getblockchaininfo) {
 
 	var match = bitcoinCoreVersionRegex.exec(getnetworkinfo.subversion);
 	if (match) {
-		global.btcNodeVersion = match[1];
+		global.dilithiumNodeVersion = match[1];
 
 		var semver4PartRegex = /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/;
 
-		var semver4PartMatch = semver4PartRegex.exec(global.btcNodeVersion);
+		var semver4PartMatch = semver4PartRegex.exec(global.dilithiumNodeVersion);
 		if (semver4PartMatch) {
 			var p0 = semver4PartMatch[1];
 			var p1 = semver4PartMatch[2];
@@ -530,32 +532,32 @@ async function onRpcConnectionVerified(getnetworkinfo, getblockchaininfo) {
 			var p3 = semver4PartMatch[4];
 
 			// drop last segment, which usually indicates a bug fix release which is (hopefully) irrelevant for RPC API versioning concerns
-			global.btcNodeSemver = `${p0}.${p1}.${p2}`;
+			global.dilithiumNodeSemver = `${p0}.${p1}.${p2}`;
 
 		} else {
 			var semver3PartRegex = /^([0-9]+)\.([0-9]+)\.([0-9]+)$/;
 
-			var semver3PartMatch = semver3PartRegex.exec(global.btcNodeVersion);
+			var semver3PartMatch = semver3PartRegex.exec(global.dilithiumNodeVersion);
 			if (semver3PartMatch) {
 				var p0 = semver3PartMatch[1];
 				var p1 = semver3PartMatch[2];
 				var p2 = semver3PartMatch[3];
 
-				global.btcNodeSemver = `${p0}.${p1}.${p2}`;
+				global.dilithiumNodeSemver = `${p0}.${p1}.${p2}`;
 
 			} else {
 				// short-circuit: force all RPC calls to pass their version checks - this will likely lead to errors / instability / unexpected results
-				global.btcNodeSemver = "1000.1000.0"
+				global.dilithiumNodeSemver = "1000.1000.0"
 			}
 		}
 	} else {
 		// short-circuit: force all RPC calls to pass their version checks - this will likely lead to errors / instability / unexpected results
-		global.btcNodeSemver = "1000.1000.0"
+		global.dilithiumNodeSemver = "1000.1000.0"
 
-		debugErrorLog(`Unable to parse node version string: ${getnetworkinfo.subversion} - RPC versioning will likely be unreliable. Is your node a version of Bitcoin Core?`);
+		debugErrorLog(`Unable to parse node version string: ${getnetworkinfo.subversion} - RPC versioning will likely be unreliable. Is your node a version of Dilithium Core?`);
 	}
 
-	debugLog(`RPC Connected: version=${getnetworkinfo.version} subversion=${getnetworkinfo.subversion}, parsedVersion(used for RPC versioning)=${global.btcNodeSemver}, protocolversion=${getnetworkinfo.protocolversion}, chain=${getblockchaininfo.chain}, services=${services}`);
+	debugLog(`RPC Connected: version=${getnetworkinfo.version} subversion=${getnetworkinfo.subversion}, parsedVersion(used for RPC versioning)=${global.dilithiumNodeSemver}, protocolversion=${getnetworkinfo.protocolversion}, chain=${getblockchaininfo.chain}, services=${services}`);
 
 
 	// load historical/fun items for this chain

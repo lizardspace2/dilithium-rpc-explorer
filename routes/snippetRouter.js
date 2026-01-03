@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug");
-const debugLog = debug("btcexp:router");
+const debugLog = debug("dilithiumexp:router");
 
 const express = require('express');
 const router = express.Router();
@@ -19,13 +19,13 @@ const coins = require("./../app/coins.js");
 const config = require("./../app/config.js");
 const coreApi = require("./../app/api/coreApi.js");
 const addressApi = require("./../app/api/addressApi.js");
-const btcQuotes = require("./../app/coins/btcQuotes.js");
+const dilithiumQuotes = require("./../app/coins/dilithiumQuotes.js");
 
 
 
 
 
-router.get("/formatCurrencyAmount/:amt", function(req, res, next) {
+router.get("/formatCurrencyAmount/:amt", function (req, res, next) {
 	res.locals.currencyValue = req.params.amt;
 
 	res.render("includes/value-display");
@@ -33,12 +33,12 @@ router.get("/formatCurrencyAmount/:amt", function(req, res, next) {
 	next();
 });
 
-router.get("/quote/random", function(req, res, next) {
+router.get("/quote/random", function (req, res, next) {
 	let done = false;
 
 	while (!done) {
-		res.locals.quoteIndex = utils.randomInt(0, btcQuotes.items.length);
-		res.locals.quote = btcQuotes.items[res.locals.quoteIndex];
+		res.locals.quoteIndex = utils.randomInt(0, dilithiumQuotes.items.length);
+		res.locals.quote = dilithiumQuotes.items[res.locals.quoteIndex];
 
 		done = !utils.objHasProperty(res.locals.quote, "duplicateIndex");
 	}
@@ -113,7 +113,7 @@ router.get("/index-halving-countdown", asyncHandler(async (req, res, next) => {
 
 		promises.push(utils.timePromise("snippet.index-halving-countdown.getBlocksByHeight", async () => {
 			const latestBlocks = await coreApi.getBlocksByHeight(blockHeights);
-			
+
 			res.locals.latestBlocks = latestBlocks;
 		}));
 

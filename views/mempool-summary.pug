@@ -678,7 +678,7 @@ block endOfBody
 
 		function estimateTransactionMempoolDepth(txid) {
 			var avgTransactionsPerBlock = 3000;
-			var satsPerBitcoin = 100000000; // TODO: magic number - replace with coinConfig.baseCurrencyUnit.multiplier
+			var satsPerCoin = 100000000; // TODO: magic number - replace with coinConfig.baseCurrencyUnit.multiplier
 			
 			$.ajax({
 				url: `./internal-api/mempool-tx-summaries/${txid}`

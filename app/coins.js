@@ -1,11 +1,9 @@
 "use strict";
 
-const btc = require("./coins/btc.js");
-const dil = require("./coins/dil.js");
+const dilithium = require("./coins/dilithium.js");
 
 module.exports = {
-	"BTC": btc,
-	"DIL": dil,
+	"DIL": dilithium,
 
-	"coins": ["BTC", "DIL"]
+	"coins": ["DIL"]
 };

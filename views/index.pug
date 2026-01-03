@@ -13,7 +13,7 @@ block content
 	- var tzMoment = moment.utc(new Date()).add(tzDiff, "hours");
 	- var tzDay = tzMoment.format("MM-DD");
 
-	if (global.btcHolidays.byDay[tzDay])
+	if (global.dilithiumHolidays.byDay[tzDay])
 		
 		- var day = tzDay;
 		- var dom = parseInt(day.substring(3));
@@ -25,7 +25,7 @@ block content
 				h5
 					i.bi-star-fill.text-warning
 					span.ms-2.fw-light.text-muted Today is...
-				each item in global.btcHolidays.byDay[tzDay]
+				each item in global.dilithiumHolidays.byDay[tzDay]
 					h6.fs-5.text-uppercase.fw-light.text-card-highlight.mt-3 #{item.name}!
 						span.ms-2 (#{months[currentMonth]} #{dom})
 				
@@ -38,10 +38,10 @@ block content
 				li
 					p
 						b If you just started your node, it may still be initializing.
-						div At startup, bitcoind verifies its block index before making itself available to serve data. The amount of time the verification process takes depends largely on the speed of the machine bitcoind is running on. If you're running bitcoind on low powered, inexpensive hardware, don't be surprised if this process takes a long time.
+						div At startup, dilithiumd verifies its block index before making itself available to serve data. The amount of time the verification process takes depends largely on the speed of the machine dilithiumd is running on. If you're running dilithiumd on low powered, inexpensive hardware, don't be surprised if this process takes a long time.
 				li
 					p
-						b If you believe your bitcoind node is already initialized...
+						b If you believe your dilithiumd node is already initialized...
 						div Check your RPC connection info and/or check this application's error log for possible hints about the cause of this issue.
 	else
 
@@ -57,7 +57,7 @@ block content
 
 			.mt-2
 				if (global.sourcecodeProjectMetadata)
-					a.btn.btn-sm.btn-primary.mb-2.mb-md-1.me-3(href="https://github.com/janoside/btc-rpc-explorer", title="View source code", data-bs-toggle="tooltip", data-bs-placement="bottom")
+					a.btn.btn-sm.btn-primary.mb-2.mb-md-1.me-3(href="https://github.com/janoside/dilithium-rpc-explorer", title="View source code", data-bs-toggle="tooltip", data-bs-placement="bottom")
 						i.bi-git.fs-6.text-white.me-2
 						| View Source
 
