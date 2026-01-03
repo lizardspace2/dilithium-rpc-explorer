@@ -225,6 +225,7 @@ module.exports = {
 			case "getnettotals": return Promise.resolve({ totalbytesrecv: 0, totalbytessent: 0, timemillis: Date.now() });
 			case "getmempoolinfo": return Promise.resolve({ size: 0, bytes: 0 });
 			case "getmininginfo": return Promise.resolve({ blocks: 0, currentblocksize: 0, currentblocktx: 0, difficulty: 0, errors: "", networkhashps: 0, pooledtx: 0, chain: "" });
+			case "getblocktemplate": return Promise.resolve({ transactions: [] });
 			case "uptime": return Promise.resolve(0);
 			case "help": return Promise.resolve("Dilithium Node");
 			default: return Promise.resolve({}); // Return empty for unknown to prevent crash
