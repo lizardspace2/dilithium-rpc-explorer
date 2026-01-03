@@ -80,38 +80,92 @@ function getBlockchainInfo() {
 	});
 }
 
+function mapBlockToBtc(block) {
+	return {
+		hash: block.hash,
+		confirmations: 1, // Calculate dynamic?
+		strippedsize: 0,
+		size: 0,
+		weight: 0,
+		height: block.index,
+		version: 1,
+		versionHex: "00000001",
+		merkleroot: block.merkleRoot,
+		tx: block.data ? block.data.map(tx => tx.id) : [],
+		time: block.timestamp,
+		mediantime: block.timestamp,
+		nonce: 0,
+		bits: "1d00ffff",
+		difficulty: block.difficulty,
+		chainwork: "0000",
+		nTx: block.data ? block.data.length : 0,
+		previousblockhash: block.previousHash,
+		minterAddress: block.minterAddress,
+		minterBalance: block.minterBalance
+	};
+}
+
 function getBlockByHash(hash) {
 	return new Promise(function (resolve, reject) {
 		getDilithiumData("/block/" + hash).then(function (block) {
-			// Map Dilithium block to Bitcoin block
-			var btcBlock = {
-				hash: block.hash,
-				confirmations: 1, // Calculate dynamic?
-				strippedsize: 0,
-				size: 0,
-				weight: 0,
-				height: block.index,
-				version: 1,
-				versionHex: "00000001",
-				merkleroot: block.merkleRoot,
-				tx: block.data.map(tx => tx.id),
-				time: block.timestamp,
-				mediantime: block.timestamp,
-				nonce: 0,
-				bits: "1d00ffff",
-				difficulty: block.difficulty,
-				chainwork: "0000",
-				nTx: block.data.length,
-				previousblockhash: block.previousHash,
-				// nextblockhash: "..." // Needed?
-				minterAddress: block.minterAddress,
-				minterBalance: block.minterBalance
-			};
-			resolve(btcBlock);
+			resolve(mapBlockToBtc(block));
 		}).catch(function (err) {
 			// If 404, might be user error or block not found
 			reject(err);
 		});
+	});
+}
+
+function getBlockByIndex(index) {
+	return new Promise(function (resolve, reject) {
+		getDilithiumData("/block/index/" + index).then(function (block) {
+			resolve(mapBlockToBtc(block));
+		}).catch(reject);
+	});
+}
+
+function getBlocksByHeight(heights) {
+	if (!heights || heights.length === 0) return Promise.resolve([]);
+
+	let sorted = [...heights].sort((a, b) => a - b);
+	let min = sorted[0];
+	let max = sorted[sorted.length - 1];
+
+	let isContiguous = true;
+	for (let i = 0; i < sorted.length - 1; i++) {
+		if (sorted[i + 1] !== sorted[i] + 1) {
+			isContiguous = false;
+			break;
+		}
+	}
+
+	if (isContiguous) {
+		return new Promise(function (resolve, reject) {
+			getDilithiumData(`/blocks/${min}/${max}`).then(function (blocks) {
+				let mapped = blocks.map(mapBlockToBtc);
+				mapped.sort((a, b) => b.height - a.height);
+				resolve(mapped);
+			}).catch(reject);
+		});
+	} else {
+		let promises = heights.map(h => getBlockByIndex(h));
+		return Promise.all(promises);
+	}
+}
+
+function getTotalSupply() {
+	return new Promise(function (resolve, reject) {
+		getDilithiumData("/totalSupply").then(function (response) {
+			resolve(response);
+		}).catch(reject);
+	});
+}
+
+function getRichList() {
+	return new Promise(function (resolve, reject) {
+		getDilithiumData("/addresses").then(function (addresses) {
+			resolve(addresses);
+		}).catch(reject);
 	});
 }
 
@@ -204,6 +258,9 @@ module.exports = {
 	getBlockByHash: getBlockByHash,
 	getRawTransaction: getRawTransaction,
 	getPeerInfo: getPeerInfo,
+	getBlocksByHeight: getBlocksByHeight,
+	getTotalSupply: getTotalSupply,
+	getRichList: getRichList,
 	// Mock other required methods to avoid crash
 	getMempoolInfo: () => Promise.resolve({ size: 0, bytes: 0 }),
 	getMiningInfo: () => Promise.resolve({ blocks: 0, currentblocksize: 0, currentblocktx: 0, difficulty: 0, errors: "", networkhashps: 0, pooledtx: 0, chain: "" }),
@@ -211,10 +268,25 @@ module.exports = {
 	getNetTotals: () => Promise.resolve({ totalbytesrecv: 0, totalbytessent: 0, timemillis: Date.now() }),
 	getChainTxStats: () => Promise.resolve(null),
 	getSmartFeeEstimate: () => Promise.resolve({ feerate: 0.0001 }),
-	getUtxoSetSummary: () => Promise.resolve(null),
+	getUtxoSetSummary: function () {
+		return new Promise((resolve, reject) => {
+			getTotalSupply().then(supply => {
+				resolve({
+					total_amount: supply,
+					txouts: 0,
+					disk_size: 0,
+					bestblock: ""
+				});
+			}).catch(err => {
+				// If fails, return null
+				resolve(null);
+			});
+		});
+	},
 	getBlockStats: () => Promise.resolve(null),
 	getIndexInfo: () => Promise.resolve({}),
 	getDeploymentInfo: () => Promise.resolve({}),
+	validateAddress: (address) => Promise.resolve({ isvalid: true, address: address }), // Mock to prevent crash
 
 	getRpcData: function (cmd) {
 		switch (cmd) {
@@ -227,7 +299,7 @@ module.exports = {
 			case "getmininginfo": return Promise.resolve({ blocks: 0, currentblocksize: 0, currentblocktx: 0, difficulty: 0, errors: "", networkhashps: 0, pooledtx: 0, chain: "" });
 			case "getblocktemplate": return Promise.resolve({ transactions: [] });
 			case "uptime": return Promise.resolve(0);
-			case "help": return Promise.resolve("Dilithium Node");
+			case "validateaddress": return Promise.resolve({ isvalid: true, address: params[0] }); // Avoid calling missing RPC
 			default: return Promise.resolve({}); // Return empty for unknown to prevent crash
 		}
 	},
@@ -242,10 +314,9 @@ module.exports = {
 				// But we need it for getBlockByHeight. 
 				// Assuming /blocks returns all, we might need to fetch all and pick one. 
 				// WARNING: Heavy operation.
+				// Use optimized endpoint
 				return new Promise((resolve, reject) => {
-					getDilithiumData("/blocks").then(blocks => {
-						var index = params[0];
-						var block = blocks.find(b => b.index == index);
+					getDilithiumData("/block/index/" + params[0]).then(block => {
 						if (block) resolve(block.hash);
 						else reject("Block not found");
 					}).catch(reject);

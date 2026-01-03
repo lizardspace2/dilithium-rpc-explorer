@@ -28,11 +28,18 @@ function getAddressDetails(address, scriptPubkey, sort, limit, offset) {
                 }
             */
 
+            // Balance from API is likely in whole coins, convert to satoshis (or atomic units)
+            // If data.balance is missing, calculate it from unspentTxOuts
+            let calculatedBalance = data.balance || 0;
+            if (!calculatedBalance && data.unspentTxOuts) {
+                calculatedBalance = data.unspentTxOuts.reduce((acc, utxo) => acc + (utxo.amount || 0), 0);
+            }
+
             // Map to Explorer expected format
             const addressDetails = {
                 address: data.address || address,
-                balance: data.balance || 0,
-                balanceSat: data.balance || 0,
+                balance: calculatedBalance,
+                balanceSat: calculatedBalance * coinConfig.baseCurrencyUnit.multiplier,
                 txCount: data.unspentTxOuts ? data.unspentTxOuts.length : 0,
                 txids: [],
                 validateAddressResult: {

@@ -1,0 +1,32 @@
+extends layout
+
+block headContent
+	title Rich List
+
+block content
+	+pageTitle("Rich List", "Top addresses by balance")
+
+	if (richList)
+		.card.mb-3.shadow-sm
+			.card-body
+				table.table.table-striped
+					thead
+						tr
+							th.text-end #
+							th Address
+							th.text-end Balance
+					tbody
+						each item, index in richList
+							if (index < 100)
+								tr
+									td.text-end #{index + 1}
+									td
+										a.text-monospace(href=`./address/${item.address}`) #{item.address}
+									td.text-end
+										+valueDisplay(item.balance)
+						
+						if (richList.length == 0)
+							tr
+								td(colspan="3") No addresses found.
+	else
+		p No data available.

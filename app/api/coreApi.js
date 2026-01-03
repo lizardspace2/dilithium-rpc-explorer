@@ -144,6 +144,20 @@ const miningSummaryCache = cacheUtils.createTieredCache(miningSummaryCaches);
 
 
 
+function getTotalSupply() {
+	if (config.btcExpIsDilithium) {
+		return dilithiumApi.getTotalSupply();
+	}
+	return Promise.resolve(null);
+}
+
+function getRichList() {
+	if (config.btcExpIsDilithium) {
+		return dilithiumApi.getRichList();
+	}
+	return Promise.resolve([]);
+}
+
 function getGenesisBlockHash() {
 	return coins[config.coin].genesisBlockHashesByNetwork[global.activeBlockchain];
 }
@@ -2251,6 +2265,8 @@ module.exports = {
 	getGenesisCoinbaseTransactionId: getGenesisCoinbaseTransactionId,
 	getBlockchainInfo: getBlockchainInfo,
 	getDeploymentInfo: getDeploymentInfo,
+	getTotalSupply: getTotalSupply,
+	getRichList: getRichList,
 	getNetworkInfo: getNetworkInfo,
 	getNetTotals: getNetTotals,
 	getMempoolInfo: getMempoolInfo,

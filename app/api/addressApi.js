@@ -42,6 +42,13 @@ function getCurrentAddressApiFeatureSupport() {
 			sortDesc: true,
 			sortAsc: true
 		};
+
+	} else if (config.addressApi == "dilithium-node") {
+		return {
+			pageNumbers: true,
+			sortDesc: true,
+			sortAsc: true
+		};
 	}
 }
 
