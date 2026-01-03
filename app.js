@@ -24,6 +24,7 @@ const configPaths = [
 	path.join(os.homedir(), ".config", "btc-rpc-explorer.env"),
 	path.join("/etc", "btc-rpc-explorer", ".env"),
 	path.join(process.cwd(), ".env"),
+	path.join(process.cwd(), "dilithium.env"),
 ];
 
 debugLog("Searching for config files...");
@@ -134,16 +135,16 @@ const statTracker = require("./app/statTracker.js");
 
 const statsProcessFunction = (name, stats) => {
 	appStats.trackAppStats(name, stats);
-	
+
 	if (process.env.STATS_API_URL) {
 		const data = Object.assign({}, stats);
 		data.name = name;
 
 		axios.post(process.env.STATS_API_URL, data)
-		.then(res => { /*console.log(res.data);*/ })
-		.catch(error => {
-			utils.logError("38974wrg9w7dsgfe", error);
-		});
+			.then(res => { /*console.log(res.data);*/ })
+			.catch(error => {
+				utils.logError("38974wrg9w7dsgfe", error);
+			});
 	}
 };
 
@@ -154,7 +155,7 @@ const processStatsInterval = setInterval(() => {
 		statsProcessFunction);
 
 }, process.env.STATS_PROCESS_INTERVAL || (5 * 60 * 1000));
-	
+
 // Don't keep Node.js process up
 processStatsInterval.unref();
 
@@ -363,14 +364,14 @@ function loadMiningPoolConfigs() {
 
 	var miningPoolsConfigDir = path.join(__dirname, "public", "txt", "mining-pools-configs", global.coinConfig.ticker);
 
-	fs.readdir(miningPoolsConfigDir, function(err, files) {
+	fs.readdir(miningPoolsConfigDir, function (err, files) {
 		if (err) {
-			utils.logError("3ufhwehe", err, {configDir:miningPoolsConfigDir, desc:"Unable to scan directory"});
+			utils.logError("3ufhwehe", err, { configDir: miningPoolsConfigDir, desc: "Unable to scan directory" });
 
 			return;
 		}
 
-		files.forEach(function(file) {
+		files.forEach(function (file) {
 			var filepath = path.join(miningPoolsConfigDir, file);
 
 			var contents = fs.readFileSync(filepath, 'utf8');
@@ -381,7 +382,7 @@ function loadMiningPoolConfigs() {
 		for (var i = 0; i < global.miningPoolsConfigs.length; i++) {
 			for (var x in global.miningPoolsConfigs[i].payout_addresses) {
 				if (global.miningPoolsConfigs[i].payout_addresses.hasOwnProperty(x)) {
-					global.specialAddresses[x] = {type:"minerPayout", minerInfo:global.miningPoolsConfigs[i].payout_addresses[x]};
+					global.specialAddresses[x] = { type: "minerPayout", minerInfo: global.miningPoolsConfigs[i].payout_addresses[x] };
 				}
 			}
 		}
@@ -402,13 +403,13 @@ async function getSourcecodeProjectMetadata() {
 
 	} catch (err) {
 		utils.logError("3208fh3ew7eghfg", err);
-		}
+	}
 }
 
 function loadChangelog() {
 	var filename = "CHANGELOG.md";
-	
-	fs.readFile(path.join(__dirname, filename), 'utf8', function(err, data) {
+
+	fs.readFile(path.join(__dirname, filename), 'utf8', function (err, data) {
 		if (err) {
 			utils.logError("2379gsd7sgd334", err);
 
@@ -419,8 +420,8 @@ function loadChangelog() {
 
 
 	var filename = "CHANGELOG-API.md";
-	
-	fs.readFile(path.join(__dirname, filename), 'utf8', function(err, data) {
+
+	fs.readFile(path.join(__dirname, filename), 'utf8', function (err, data) {
 		if (err) {
 			utils.logError("ouqhuwey723", err);
 
@@ -434,7 +435,7 @@ function loadHistoricalDataForChain(chain) {
 	debugLog(`Loading historical data for chain=${chain}`);
 
 	if (global.coinConfig.historicalData) {
-		global.coinConfig.historicalData.forEach(function(item) {
+		global.coinConfig.historicalData.forEach(function (item) {
 			if (item.chain == chain) {
 				if (item.type == "blockheight") {
 					global.specialBlocks[item.blockHash] = item;
@@ -443,7 +444,7 @@ function loadHistoricalDataForChain(chain) {
 					global.specialTransactions[item.txid] = item;
 
 				} else if (item.type == "address" || item.address) {
-					global.specialAddresses[item.address] = {type:"fun", addressInfo:item};
+					global.specialAddresses[item.address] = { type: "fun", addressInfo: item };
 				}
 			}
 		});
@@ -459,7 +460,7 @@ function loadHolidays(chain) {
 	global.btcHolidays.sortedItems = [...btcHolidays.items];
 	global.btcHolidays.sortedItems.sort((a, b) => a.date.localeCompare(b.date));
 
-	global.btcHolidays.items.forEach(function(item) {
+	global.btcHolidays.items.forEach(function (item) {
 		let day = item.date.substring(5);
 
 		if (!global.btcHolidays.sortedDays.includes(day)) {
@@ -487,7 +488,7 @@ function verifyRpcConnection() {
 		Promise.all([
 			rpcApi.getRpcData("getnetworkinfo", true),
 			rpcApi.getRpcData("getblockchaininfo", true),
-		]).then(([ getnetworkinfo, getblockchaininfo ]) => {
+		]).then(([getnetworkinfo, getblockchaininfo]) => {
 			global.activeBlockchain = getblockchaininfo.chain;
 
 			// we've verified rpc connection, no need to keep trying
@@ -495,7 +496,7 @@ function verifyRpcConnection() {
 
 			onRpcConnectionVerified(getnetworkinfo, getblockchaininfo);
 
-		}).catch(function(err) {
+		}).catch(function (err) {
 			utils.logError("32ugegdfsde", err);
 		});
 	}
@@ -553,10 +554,10 @@ async function onRpcConnectionVerified(getnetworkinfo, getblockchaininfo) {
 
 		debugErrorLog(`Unable to parse node version string: ${getnetworkinfo.subversion} - RPC versioning will likely be unreliable. Is your node a version of Bitcoin Core?`);
 	}
-	
+
 	debugLog(`RPC Connected: version=${getnetworkinfo.version} subversion=${getnetworkinfo.subversion}, parsedVersion(used for RPC versioning)=${global.btcNodeSemver}, protocolversion=${getnetworkinfo.protocolversion}, chain=${getblockchaininfo.chain}, services=${services}`);
 
-	
+
 	// load historical/fun items for this chain
 	loadHistoricalDataForChain(global.activeBlockchain);
 
@@ -621,7 +622,7 @@ async function monitorNewTransactions() {
 	}
 }
 
-async function loadDifficultyHistory(tipBlockHeight=null) {
+async function loadDifficultyHistory(tipBlockHeight = null) {
 	if (!tipBlockHeight) {
 		let getblockchaininfo = await coreApi.getBlockchainInfo();
 
@@ -643,10 +644,10 @@ async function loadDifficultyHistory(tipBlockHeight=null) {
 	}
 
 	global.difficultyHistory = await coreApi.getDifficultyByBlockHeights(heights);
-	
+
 	global.athDifficulty = 0;
 	for (let i = 0; i < heights.length; i++) {
-		if (global.difficultyHistory[`${heights[i]}`].difficulty > global.athDifficulty) {	
+		if (global.difficultyHistory[`${heights[i]}`].difficulty > global.athDifficulty) {
 			global.athDifficulty = global.difficultyHistory[heights[i]].difficulty;
 		}
 	}
@@ -669,7 +670,7 @@ async function assessTxindexAvailability() {
 
 		if (global.getindexinfo.txindex) {
 			// getindexinfo was available, and txindex is also available...easy street
-			
+
 			global.txindexAvailable = true;
 
 			debugLog("txindex check: available!");
@@ -746,7 +747,7 @@ function refreshNetworkVolumes() {
 	var cutoff1d = new Date().getTime() - (60 * 60 * 24 * 1000);
 	var cutoff7d = new Date().getTime() - (60 * 60 * 24 * 7 * 1000);
 
-	coreApi.getBlockchainInfo().then(function(result) {
+	coreApi.getBlockchainInfo().then(function (result) {
 		var promises = [];
 
 		var blocksPerDay = 144 + 20; // 20 block padding
@@ -765,7 +766,7 @@ function refreshNetworkVolumes() {
 		var endBlockTime1d = 0;
 		var endBlockTime7d = 0;
 
-		Promise.all(promises).then(function(results) {
+		Promise.all(promises).then(function (results) {
 			var volume1d = new Decimal(0);
 			var volume7d = new Decimal(0);
 
@@ -798,7 +799,7 @@ function refreshNetworkVolumes() {
 				volume1d = volume1d.dividedBy(coinConfig.baseCurrencyUnit.multiplier);
 				volume7d = volume7d.dividedBy(coinConfig.baseCurrencyUnit.multiplier);
 
-				global.networkVolume = {d1:{amt:volume1d, blocks:blocks1d, startBlock:startBlock, endBlock:endBlock1d, startTime:results[0].time, endTime:endBlockTime1d}};
+				global.networkVolume = { d1: { amt: volume1d, blocks: blocks1d, startBlock: startBlock, endBlock: endBlock1d, startTime: results[0].time, endTime: endBlockTime1d } };
 
 				debugLog(`Network volume: ${JSON.stringify(global.networkVolume)}`);
 
@@ -812,7 +813,7 @@ function refreshNetworkVolumes() {
 
 expressApp.onStartup = async () => {
 	global.appStartTime = new Date().getTime();
-	
+
 	global.config = config;
 	global.coinConfig = coins[config.coin];
 	global.coinConfigs = coins;
@@ -832,7 +833,7 @@ expressApp.onStartup = async () => {
 	// dump "startup" heap after 5sec
 	if (false) {
 		(function () {
-			var callback = function() {
+			var callback = function () {
 				debugLog("Waited 5 sec after startup, now dumping 'startup' heap...");
 
 				const filename = `./heapDumpAtStartup-${Date.now()}.heapsnapshot`;
@@ -846,7 +847,7 @@ expressApp.onStartup = async () => {
 			setTimeout(callback, 5000);
 		})();
 	}
-	
+
 
 	if (global.sourcecodeVersion == null && fs.existsSync('.git')) {
 		try {
@@ -863,14 +864,14 @@ expressApp.onStartup = async () => {
 
 
 		} catch (err) {
-			utils.logError("3fehge9ee", err, {desc:"Error accessing git repo"});
+			utils.logError("3fehge9ee", err, { desc: "Error accessing git repo" });
 
 			global.cacheId = global.appVersion;
 			debugLog(`Error getting sourcecode version, continuing to use default cacheId '${global.cacheId}'`);
 
 			debugLog(`Starting ${global.coinConfig.ticker} RPC Explorer, v${global.appVersion} (code: unknown commit) at http://${config.host}:${config.port}${config.baseUrl}`);
 		}
-		
+
 		expressApp.continueStartup();
 
 	} else {
@@ -895,7 +896,7 @@ expressApp.onStartup = async () => {
 			try {
 				let absoluteFilepath = path.join(process.cwd(), "public", filepath);
 				let s3path = s3Path(filepath);
-				
+
 				const existingAsset = await cdnS3Bucket.get(s3path);
 
 				if (existingAsset) {
@@ -904,7 +905,7 @@ expressApp.onStartup = async () => {
 					//debugLog(`Asset ${filepath} already in S3, skipping upload.`);
 
 				} else {
-					let fileData = fs.readFileSync(absoluteFilepath, {encoding: encoding, flag:'r'});
+					let fileData = fs.readFileSync(absoluteFilepath, { encoding: encoding, flag: 'r' });
 					let fileBuffer = Buffer.from(fileData, encoding);
 
 					let options = {
@@ -989,7 +990,7 @@ function connectToRpcServer() {
 	global.rpcClientNoTimeout = jayson.Client.http(rpcClientNoTimeoutProperties);
 }
 
-expressApp.continueStartup = function() {
+expressApp.continueStartup = function () {
 	connectToRpcServer();
 
 	// if using cookie auth, watch for changes to the file and reconnect
@@ -1024,11 +1025,11 @@ expressApp.continueStartup = function() {
 
 		if (config.addressApi == "electrum" || config.addressApi == "electrumx") {
 			if (config.electrumServers && config.electrumServers.length > 0) {
-				electrumAddressApi.connectToServers().then(function() {
+				electrumAddressApi.connectToServers().then(function () {
 					global.electrumAddressApi = electrumAddressApi;
-					
-				}).catch(function(err) {
-					utils.logError("31207ugf4e0fed", err, {electrumServers:config.electrumServers});
+
+				}).catch(function (err) {
+					utils.logError("31207ugf4e0fed", err, { electrumServers: config.electrumServers });
 				});
 			} else {
 				utils.logError("327hs0gde", "You must set the 'BTCEXP_ELECTRUM_SERVERS' environment variable when BTCEXP_ADDRESS_API=electrum.");
@@ -1050,7 +1051,7 @@ expressApp.continueStartup = function() {
 	setInterval(utils.logMemoryUsage, 5000);
 };
 
-expressApp.use(function(req, res, next) {
+expressApp.use(function (req, res, next) {
 	utils.trackAppEvent("request");
 
 	req.startTime = Date.now();
@@ -1058,7 +1059,7 @@ expressApp.use(function(req, res, next) {
 	next();
 });
 
-expressApp.use(function(req, res, next) {
+expressApp.use(function (req, res, next) {
 	// make session available in templates
 	res.locals.session = req.session;
 
@@ -1082,7 +1083,7 @@ expressApp.use(function(req, res, next) {
 	res.locals.utxoSetSummary = global.utxoSetSummary;
 	res.locals.utxoSetSummaryPending = global.utxoSetSummaryPending;
 	res.locals.networkVolume = global.networkVolume;
-	
+
 	res.locals.host = req.session.host;
 	res.locals.port = req.session.port;
 
@@ -1128,10 +1129,10 @@ expressApp.use(function(req, res, next) {
 
 	if (req.session.userMessage) {
 		res.locals.userMessage = req.session.userMessage;
-		
+
 		if (req.session.userMessageType) {
 			res.locals.userMessageType = req.session.userMessageType;
-			
+
 		} else {
 			res.locals.userMessageType = "warning";
 		}
@@ -1155,7 +1156,7 @@ expressApp.use(function(req, res, next) {
 
 		return;
 	}
-	
+
 
 	// make some var available to all request
 	// ex: req.cheeseStr = "cheese";
@@ -1182,7 +1183,7 @@ if (expressApp.get("env") === "local") {
 }
 
 
-expressApp.use(function(req, res, next) {
+expressApp.use(function (req, res, next) {
 	var time = Date.now() - req.startTime;
 	var userAgent = req.headers['user-agent'];
 	var crawler = utils.getCrawlerFromUserAgentString(userAgent);
@@ -1201,7 +1202,7 @@ expressApp.use(function(req, res, next) {
 });
 
 /// catch 404 and forwarding to error handler
-expressApp.use(function(req, res, next) {
+expressApp.use(function (req, res, next) {
 	utils.trackAppEvent("error404");
 
 	var err = new Error(`Not Found: ${req ? req.url : 'unknown url'}`);
@@ -1217,14 +1218,14 @@ const sharedErrorHandler = (req, err) => {
 		const path = err.toString().substring(err.toString().lastIndexOf(" ") + 1);
 		const userAgent = req.headers['user-agent'];
 		const crawler = utils.getCrawlerFromUserAgentString(userAgent);
-		const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress; 
+		const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-		const attributes = { path:path };
+		const attributes = { path: path };
 
 		if (crawler) {
 			attributes.crawler = crawler;
 
-			utils.trackAppEvent("crawlRequest", 1, {"crawler": crawler});
+			utils.trackAppEvent("crawlRequest", 1, { "crawler": crawler });
 		}
 
 		debugErrorLog(`404 NotFound: path=${path}, ip=${ip}, userAgent=${userAgent} (crawler=${(crawler != null)}${crawler ? crawler : ""})`);
@@ -1239,7 +1240,7 @@ const sharedErrorHandler = (req, err) => {
 // development error handler
 // will print stacktrace
 if (expressApp.get("env") === "development" || expressApp.get("env") === "local") {
-	expressApp.use(function(err, req, res, next) {
+	expressApp.use(function (err, req, res, next) {
 		if (err) {
 			sharedErrorHandler(req, err);
 		}
@@ -1254,7 +1255,7 @@ if (expressApp.get("env") === "development" || expressApp.get("env") === "local"
 
 // production error handler
 // no stacktraces leaked to user
-expressApp.use(function(err, req, res, next) {
+expressApp.use(function (err, req, res, next) {
 	if (err) {
 		sharedErrorHandler(req, err);
 	}
