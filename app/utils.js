@@ -1513,6 +1513,13 @@ function tryParseAddress(address) {
 
 	let parsedAddress = null;
 
+	if (address.match(/^[a-f0-9]{64,5000}$/i)) {
+		return {
+			encoding: "hex",
+			parsedAddress: address
+		};
+	}
+
 	let b58prefix = (global.activeBlockchain == "main" ? /^[13].*$/ : /^[2mn].*$/);
 	if (address.match(b58prefix)) {
 		try {

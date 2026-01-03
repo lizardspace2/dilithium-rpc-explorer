@@ -8,9 +8,10 @@ const electrumAddressApi = require("./electrumAddressApi.js");
 const blockchainAddressApi = require("./blockchainAddressApi.js");
 const blockchairAddressApi = require("./blockchairAddressApi.js");
 const blockcypherAddressApi = require("./blockcypherAddressApi.js");
+const dilithiumAddressApi = require("./dilithiumAddressApi.js");
 
 function getSupportedAddressApis() {
-	return ["blockchain.com", "blockchair.com", "blockcypher.com", "electrum", "electrumx"];
+	return ["blockchain.com", "blockchair.com", "blockcypher.com", "electrum", "electrumx", "dilithium-node"];
 }
 
 function getCurrentAddressApiFeatureSupport() {
@@ -45,7 +46,7 @@ function getCurrentAddressApiFeatureSupport() {
 }
 
 function getAddressDetails(address, scriptPubkey, sort, limit, offset) {
-	return new Promise(function(resolve, reject) {
+	return new Promise(function (resolve, reject) {
 		var promises = [];
 
 		if (config.addressApi == "blockchain.com") {
@@ -60,20 +61,23 @@ function getAddressDetails(address, scriptPubkey, sort, limit, offset) {
 		} else if (config.addressApi == "electrum" || config.addressApi == "electrumx") {
 			promises.push(electrumAddressApi.getAddressDetails(address, scriptPubkey, sort, limit, offset));
 
+		} else if (config.addressApi == "dilithium-node") {
+			promises.push(dilithiumAddressApi.getAddressDetails(address, scriptPubkey, sort, limit, offset));
+
 		} else {
-			promises.push(new Promise(function(resolve, reject) {
-				resolve({addressDetails:null, errors:["No address API configured"]});
+			promises.push(new Promise(function (resolve, reject) {
+				resolve({ addressDetails: null, errors: ["No address API configured"] });
 			}));
 		}
 
-		Promise.all(promises).then(function(results) {
+		Promise.all(promises).then(function (results) {
 			if (results && results.length > 0) {
 				resolve(results[0]);
 
 			} else {
 				resolve(null);
 			}
-		}).catch(function(err) {
+		}).catch(function (err) {
 			reject(err);
 		});
 	});
