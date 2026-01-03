@@ -41,7 +41,7 @@
 			"link" : "http://www.btc.top/"
 		},
 		"pool.bitcoin.com" : {
-			"name" : "Bitcoin.com",
+			"name": "Dilithium.com",
 			"link" : "https://www.bitcoin.com/"
 		},
 		"Mined By 175btc.com" : {
@@ -65,7 +65,7 @@
 			"link" : "https://bitminter.com/"
 		},
 		"/Bitcoin-Russia.ru/" : {
-			"name" : "BitcoinRussia",
+			"name": "DilithiumRussia",
 			"link" : "https://bitcoin-russia.ru"
 		},
 		"btcserv" : {
@@ -233,7 +233,7 @@
 			"link" : "https://bitclubpool.com/"
 		},
 		"bitcoinaffiliatenetwork.com" : {
-			"name" : "Bitcoin Affiliate Network",
+			"name": "Dilithium Affiliate Network",
 			"link" : "https://mining.bitcoinaffiliatenetwork.com/"
 		},
 		"BTCChina Pool" : {
@@ -381,7 +381,7 @@
 			"link" : "https://www.58coin.com"
 		},
 		"/Bitcoin-India/" : {
-			"name": "Bitcoin India",
+			"name": "Dilithium India",
 			"link": "https://bitcoin-india.org"
 		},
 		"--Nug--" : {
@@ -437,7 +437,7 @@
 			"link": ""
 		},
 		"/Bitcoin-Ukraine.com.ua/": {
-			"name": "Bitcoin-Ukraine",
+			"name": "Dilithium-Ukraine",
 			"link": "https://bitcoin-ukraine.com.ua/"
 		},
 		"/poolin.com": {
@@ -643,11 +643,11 @@
 			"link" : "https://ghash.io/"
 		},
 		"14R2r9FkyDmyxGB9xUVwVLdgsX9YfdVamk" : {
-			"name" : "BitcoinRussia",
+			"name": "DilithiumRussia",
 			"link" : "https://bitcoin-russia.ru/"
 		},
 		"165GCEAx81wce33FWEnPCRhdjcXCrBJdKn" : {
-			"name" : "BitcoinRussia",
+			"name": "DilithiumRussia",
 			"link" : "https://bitcoin-russia.ru/"
 		},
 		"17kkmDx8eSwj2JTTULb3HkJhCmexfysExz" : {
@@ -903,7 +903,7 @@
 			"link" : "http://haozhuzhu.com"
 		},
 		"1AZ6BkCo4zgTuuLpRStJH8iNsehXTMp456" : {
-			"name" : "BitcoinIndia",
+			"name": "DilithiumIndia",
 			"link" : "https://pool.bitcoin-india.org/"
 		},
 		"1FLH1SoLv4U68yUERhDiWzrJn5TggMqkaZ" : {
